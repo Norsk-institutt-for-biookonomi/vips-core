@@ -9,10 +9,11 @@ import javax.ws.rs.core.Response;
 import no.bioforsk.vips.core.entities.Weather;
 
 /**
- *
- * @author treinar
+ * 
+ * @copyright Bioforsk.no
+ * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
  */
-@Path("/") 
+@Path("test") 
 public class TestResource {
     @GET
     @Path("Hello/{name}") 
@@ -29,8 +30,8 @@ public class TestResource {
     }
     
     /**
-     * Marshalling fra POJO til JSON gjøres automagis (med Jackson)
-     * @return 
+     * Marshalling fra POJO til JSON gjøres automagisk (med Jackson, tror jeg)
+     * @return gladmelding
      */
     @GET
     @Path("weather/json")
