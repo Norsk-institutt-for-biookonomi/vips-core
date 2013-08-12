@@ -4,6 +4,11 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+/**
+ * Responsible for adding REST resources
+ * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
+ * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
+ */
 @ApplicationPath("/")
 public class VIPSCoreApplication extends Application
 {
@@ -20,6 +25,8 @@ public class VIPSCoreApplication extends Application
      * given list with all resources defined in the project.
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(no.bioforsk.vips.core.service.TestResource.class);
+        resources.add(no.bioforsk.vips.core.service.ModelResource.class);
+
+
     }
 }
