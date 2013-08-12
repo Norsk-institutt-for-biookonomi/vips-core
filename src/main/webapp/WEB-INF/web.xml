@@ -3,7 +3,7 @@
     <listener>
         <listener-class>no.bioforsk.vips.core.startup.StartupListener</listener-class>
     </listener>
-    <!-- This is for allowing Cross-Site requests -->
+    <!-- This is for allowing Cross-Site requests See: http://software.dzhuvinov.com/cors-filter.html -->
     <filter>
 	<filter-name>CORS</filter-name>
 	<filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
