@@ -46,6 +46,22 @@ public class ModelResource {
     /**
      * Prints the usage instructions from the requested model
      * @param modelId
+     * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
+     * @return 
+     */
+    @GET
+    @Path("models/{modelId}/usage/{language}")
+    @Produces("text/plain;charset=UTF-8")
+    public Response printModelUsage(@PathParam("modelId") String modelId, @PathParam("language") String language)
+    {
+        String usage = ModelFactory.getInstance().getModelUsage(modelId, language);
+        return Response.ok().entity(usage).build();
+    }
+    
+    /**
+     * Prints the usage instructions from the requested model
+     * @param modelId
+     * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return 
      */
     @GET
@@ -53,8 +69,7 @@ public class ModelResource {
     @Produces("text/plain;charset=UTF-8")
     public Response printModelUsage(@PathParam("modelId") String modelId)
     {
-        String usage = ModelFactory.getInstance().getModelUsage(modelId);
-        return Response.ok().entity(usage).build();
+        return this.printModelUsage(modelId, null);
     }
     
     /** Tests for XML and JSON output */

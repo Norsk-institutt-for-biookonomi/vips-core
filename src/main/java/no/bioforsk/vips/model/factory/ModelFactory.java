@@ -149,14 +149,13 @@ public class ModelFactory {
     }
     
     /**
-     * TODO: Add support for locale
      * @param modelId the id of the Model
      * @return usage instructions for the requested Model
      * 
      */
-    public String getModelUsage(String modelId)
+    public String getModelUsage(String modelId, String language)
     {
-        return this.models.get(modelId).getModelUsage();
+        return language != null ? this.models.get(modelId).getModelUsage(language) : this.models.get(modelId).getModelUsage();
     }
     
     /**
