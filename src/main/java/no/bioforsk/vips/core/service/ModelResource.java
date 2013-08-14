@@ -127,6 +127,7 @@ public class ModelResource {
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(config.getModelId());
+            calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
         catch(InstantiationException | IllegalAccessException iae)
