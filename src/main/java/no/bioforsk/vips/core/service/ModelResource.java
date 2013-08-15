@@ -1,8 +1,7 @@
 package no.bioforsk.vips.core.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,9 +10,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
-import no.bioforsk.vips.entity.Result;
-import no.bioforsk.vips.entity.ResultImpl;
-import no.bioforsk.vips.entity.Weather;
 import no.bioforsk.vips.model.Model;
 import no.bioforsk.vips.model.factory.ModelFactory;
 
@@ -26,19 +22,106 @@ import no.bioforsk.vips.model.factory.ModelFactory;
 public class ModelResource {
     
     /**
-     * Lists all models available in this instance
-     * @return 
+     * Lists all models available in this instance, using default language (English)
+     * @return list of all models available
      */
     @GET
     @Path("models")
     @Produces("text/plain;charset=UTF-8")
-    public Response printModels()
+    public Response printModelList()
+    {
+        return this.printModelList(null);
+        /*
+        StringBuilder retVal = new StringBuilder();
+        ModelFactory mF = ModelFactory.getInstance();
+        for(String key : mF.getModelList().keySet())
+        {
+            try {
+                retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName()).append("\n");
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        return Response.ok().entity(retVal.toString()).build();*/
+    }
+    
+    /**
+     * Lists all models available in this instance, using default language (English)
+     * @return list of all models available
+     */
+    @GET
+    @Path("models/json")
+    @Produces("application/json;charset=UTF-8")
+    public Response printModelListJSON()
+    {
+        /*
+        StringBuilder retVal = new StringBuilder();
+        ModelFactory mF = ModelFactory.getInstance();
+        for(String key : mF.getModelList().keySet())
+        {
+            try {
+                retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName()).append("\n");
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        return Response.ok().entity(retVal.toString()).build();
+        * */
+        return this.printModelListJSON(null);
+    }
+    
+    /**
+     * Lists all models available in this instance, using default language (English)
+     * @return list of all models available
+     */
+    @GET
+    @Path("models/json/{language}")
+    @Produces("application/json;charset=UTF-8")
+    public Response printModelListJSON(@PathParam("language") String language)
+    {
+        StringBuilder retVal = new StringBuilder();
+        ModelFactory mF = ModelFactory.getInstance();
+        retVal.append("[");
+        boolean first=true;
+        for(String key : mF.getModelList().keySet())
+        {
+            try {
+                if(first) first=false;
+                else retVal.append(",");
+                retVal.append("{");
+                retVal.append("\"modelId\":\"").append(key).append("\", \"modelName\":\"").append(mF.getModelInstance(key).getModelName(language)).append("\"");
+                retVal.append("}");
+                
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        retVal.append("]");
+        return Response.ok().entity(retVal.toString()).build();
+    }
+    
+    /**
+     * Lists all models available in this instance, using default language (English)
+     * @return list of all models available
+     */
+    @GET
+    @Path("models/{language}")
+    @Produces("text/plain;charset=UTF-8")
+    public Response printModelList(@PathParam("language") String language)
     {
         StringBuilder retVal = new StringBuilder();
         ModelFactory mF = ModelFactory.getInstance();
         for(String key : mF.getModelList().keySet())
         {
-            retVal.append(key).append("\n");
+            try {
+                retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
+            } catch (InstantiationException | IllegalAccessException ex) {
+                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
         return Response.ok().entity(retVal.toString()).build();
     }
@@ -72,66 +155,65 @@ public class ModelResource {
         return this.printModelUsage(modelId, null);
     }
     
-    /** Tests for XML and JSON output */
     @GET
-    @Path("models/resulttest")
-    @Produces("application/json")
-    public Response printResultTest()
+    @Path("models/{modelId}/sampleconfig")
+    @Produces("text/plain;charset=UTF-8")
+    public Response printModelSampleConfig(@PathParam("modelId") String modelId)
     {
-        List<Result> allResults = new ArrayList();
-        Result retVal = new ResultImpl();
-        retVal.setResultValidTime(new Date());
-        retVal.setValue("Parameter1", "Verdi1");
-        retVal.setValue("Parameter2", "Verdi2");
-        allResults.add(retVal);
-        retVal = new ResultImpl();
-        retVal.setResultValidTime(new Date());
-        retVal.setValue("Parameter1", "Verdi5");
-        retVal.setValue("Parameter2", "Verdi7");
-         allResults.add(retVal);
-        return Response.ok().entity(allResults).build();
-    }
-    
-    @GET
-    @Path("weather/xml")
-    @Produces("application/xml")
-    public Response printWeatherXML()
-    {
-        return Response.ok().entity(new Weather(new Date(),"Goddag, goddag. Dette her er Meteorologisk institutt.æøåæøå")).build();
+        try {
+            String sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
+            return Response.ok().entity(sampleConfig).build();
+        } catch (InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.serverError().build();
+        }
     }
     
     /**
-     * Marshalling fra POJO til JSON gjøres automagisk (med Jackson, tror jeg)
-     * @return gladmelding
+     * Instantiates and runs the requested model
+     * @param config input data for the model
+     * @return list of result objects
      */
-    @GET
-    @Path("weather/json")
-    @Produces("application/json")
-    public Response printWeatherJSON()
-    {
-        return Response.ok().entity(new Weather(new Date(),"Goddag, goddag. Dette her er Meteorologisk institutt.æøåæøå")).build();
-    }
-    
-    /**
-     * Test for input / POST
-     */
-    
     @POST
     @Path("models/run")
     @Consumes("application/json")
     @Produces("application/json")
-    //@Produces("text/plain;charset=UTF-8")
     public Response runModel(ModelConfiguration config)
     {
-        //return Response.ok().entity("runModell called").build();
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(config.getModelId());
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException iae)
+        catch(InstantiationException | IllegalAccessException ex)
         {
+            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.serverError().build();
+        }
+    }
+    
+    /**
+     * Instantiates and runs the requested model
+     * @param modelId
+     * @param config input data for the model
+     * @return list of result objects
+     */
+    @POST
+    @Path("models/{modelId}/run")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
+    {
+        try
+        {
+            Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
+            calledModel.setConfiguration(config);
+            return Response.ok().entity(calledModel.getResult()).build();
+        }
+        catch(InstantiationException | IllegalAccessException ex)
+        {
+            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().build();
         }
     }
