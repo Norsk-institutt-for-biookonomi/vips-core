@@ -2,12 +2,7 @@ package no.bioforsk.vips.core.service;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
 import no.bioforsk.vips.model.Model;
@@ -18,57 +13,30 @@ import no.bioforsk.vips.model.factory.ModelFactory;
  * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
  * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
  */
-@Path("") 
-public class ModelResource {
-    
+public class ModelResourceImpl implements ModelResource{
+     
     /**
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    @GET
-    @Path("models")
-    @Produces("text/plain;charset=UTF-8")
+    @Override
     public Response printModelList()
     {
         return this.printModelList(null);
-        /*
-        StringBuilder retVal = new StringBuilder();
-        ModelFactory mF = ModelFactory.getInstance();
-        for(String key : mF.getModelList().keySet())
-        {
-            try {
-                retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName()).append("\n");
-            } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-        }
-        return Response.ok().entity(retVal.toString()).build();*/
+        
     }
     
     /**
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    @GET
-    @Path("models/json")
-    @Produces("application/json;charset=UTF-8")
+    //@GET
+    //@Path("models/json")
+    //@Produces("application/json;charset=UTF-8")
+    @Override
     public Response printModelListJSON()
     {
-        /*
-        StringBuilder retVal = new StringBuilder();
-        ModelFactory mF = ModelFactory.getInstance();
-        for(String key : mF.getModelList().keySet())
-        {
-            try {
-                retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName()).append("\n");
-            } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-        }
-        return Response.ok().entity(retVal.toString()).build();
-        * */
+        
         return this.printModelListJSON(null);
     }
     
@@ -76,9 +44,10 @@ public class ModelResource {
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    @GET
-    @Path("models/json/{language}")
-    @Produces("application/json;charset=UTF-8")
+    //@GET
+    //@Path("models/json/{language}")
+    //@Produces("application/json;charset=UTF-8")
+    @Override
     public Response printModelListJSON(@PathParam("language") String language)
     {
         StringBuilder retVal = new StringBuilder();
@@ -95,7 +64,7 @@ public class ModelResource {
                 retVal.append("}");
                 
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         }
@@ -107,9 +76,10 @@ public class ModelResource {
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    @GET
-    @Path("models/{language}")
-    @Produces("text/plain;charset=UTF-8")
+    //@GET
+    //@Path("models/{language}")
+    //@Produces("text/plain;charset=UTF-8")
+    @Override
     public Response printModelList(@PathParam("language") String language)
     {
         StringBuilder retVal = new StringBuilder();
@@ -119,7 +89,7 @@ public class ModelResource {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
             } catch (InstantiationException | IllegalAccessException ex) {
-                Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         }
@@ -132,9 +102,10 @@ public class ModelResource {
      * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return 
      */
-    @GET
-    @Path("models/{modelId}/usage/{language}")
-    @Produces("text/plain;charset=UTF-8")
+    //@GET
+    //@Path("models/{modelId}/usage/{language}")
+    //@Produces("text/plain;charset=UTF-8")
+    @Override
     public Response printModelUsage(@PathParam("modelId") String modelId, @PathParam("language") String language)
     {
         String usage = ModelFactory.getInstance().getModelUsage(modelId, language);
@@ -147,24 +118,31 @@ public class ModelResource {
      * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return 
      */
-    @GET
-    @Path("models/{modelId}/usage")
-    @Produces("text/plain;charset=UTF-8")
+    //@GET
+    //@Path("models/{modelId}/usage")
+    //@Produces("text/plain;charset=UTF-8")
+    @Override
     public Response printModelUsage(@PathParam("modelId") String modelId)
     {
         return this.printModelUsage(modelId, null);
     }
     
-    @GET
-    @Path("models/{modelId}/sampleconfig")
-    @Produces("text/plain;charset=UTF-8")
+    /**
+     * Outputs a sample configuration for the requested model
+     * @param modelId the requested model
+     * @return 
+     */
+    //@GET
+    //@Path("models/{modelId}/sampleconfig")
+    //@Produces("text/plain;charset=UTF-8")
+    @Override
     public Response printModelSampleConfig(@PathParam("modelId") String modelId)
     {
         try {
             String sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
             return Response.ok().entity(sampleConfig).build();
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().build();
         }
     }
@@ -174,10 +152,11 @@ public class ModelResource {
      * @param config input data for the model
      * @return list of result objects
      */
-    @POST
-    @Path("models/run")
-    @Consumes("application/json")
-    @Produces("application/json")
+    //@POST
+    //@Path("models/run")
+    //@Consumes("application/json")
+    //@Produces("application/json")
+    @Override
     public Response runModel(ModelConfiguration config)
     {
         try
@@ -188,7 +167,7 @@ public class ModelResource {
         }
         catch(InstantiationException | IllegalAccessException ex)
         {
-            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().build();
         }
     }
@@ -199,10 +178,11 @@ public class ModelResource {
      * @param config input data for the model
      * @return list of result objects
      */
-    @POST
-    @Path("models/{modelId}/run")
-    @Consumes("application/json")
-    @Produces("application/json")
+    //@POST
+    //@Path("models/{modelId}/run")
+    //@Consumes("application/json")
+    //@Produces("application/json")
+    @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
         try
@@ -213,7 +193,7 @@ public class ModelResource {
         }
         catch(InstantiationException | IllegalAccessException ex)
         {
-            Logger.getLogger(ModelResource.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().build();
         }
     }
