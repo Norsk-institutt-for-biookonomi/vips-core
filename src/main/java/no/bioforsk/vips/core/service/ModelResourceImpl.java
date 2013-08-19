@@ -3,9 +3,12 @@ package no.bioforsk.vips.core.service;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
+import no.bioforsk.vips.model.ConfigValidationException;
 import no.bioforsk.vips.model.Model;
+import no.bioforsk.vips.model.ModelExcecutionException;
 import no.bioforsk.vips.model.factory.ModelFactory;
 
 /**
@@ -177,10 +180,10 @@ public class ModelResourceImpl implements ModelResource{
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.serverError().build();
+            return Response.serverError().entity(ex.getMessage()).build();
         }
     }
     
@@ -203,10 +206,17 @@ public class ModelResourceImpl implements ModelResource{
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            return Response.serverError().build();
+            if(ex instanceof ConfigValidationException){
+            
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(ex).build());
+            }
+            else
+            {
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex).build());
+            }
         }
     }
 
