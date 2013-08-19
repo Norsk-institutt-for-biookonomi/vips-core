@@ -15,12 +15,20 @@ public class VIPSCoreApplication extends Application
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resources = new java.util.HashSet<>();
-        addRestResourceClasses(resources);
-        addInterfaceImplRestResourceClasses(resources);
+        //addRestResourceClasses(resources); //We don't use this!
+        addRestResourceClassesManually(resources);
         return resources;
     }
-    
-    //resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
+
+    /**
+     * Handmade because NetBeans doesn't discover the services that are implementations
+     * of service interfaces. And it adds the interfaces it finds, which do not work
+     * @param resources 
+     */
+    private void addRestResourceClassesManually(Set<Class<?>> resources) {
+        resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
+        resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
+    }
 
     /**
      * Do not modify addRestResourceClasses() method.
@@ -29,16 +37,5 @@ public class VIPSCoreApplication extends Application
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
-        
-
-    }
-
-    /**
-     * Handmade because NetBeans doesn't discover the services that are implementations
-     * of service interfaces.
-     * @param resources 
-     */
-    private void addInterfaceImplRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
     }
 }

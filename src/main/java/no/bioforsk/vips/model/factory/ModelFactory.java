@@ -149,6 +149,16 @@ public class ModelFactory {
     }
     
     /**
+     * 
+     * @param modelId ID of the requested model
+     * @param language language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
+     * @return Description of model in requested language (Default/fallback is English)
+     */
+    public String getModelDescription(String modelId, String language) {
+        return language != null ? this.models.get(modelId).getModelDescription(language) : this.models.get(modelId).getModelDescription();
+    }
+    
+    /**
      * @param modelId the id of the Model
      * @return usage instructions for the requested Model
      * 
@@ -169,6 +179,8 @@ public class ModelFactory {
     {
             return this.models.get(modelId).getClass().newInstance();
     }
+
+    
     
     
 }

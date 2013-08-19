@@ -82,6 +82,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response printModelList(@PathParam("language") String language)
     {
+        // test comment
         StringBuilder retVal = new StringBuilder();
         ModelFactory mF = ModelFactory.getInstance();
         for(String key : mF.getModelList().keySet())
@@ -96,6 +97,17 @@ public class ModelResourceImpl implements ModelResource{
         return Response.ok().entity(retVal.toString()).build();
     }
     
+    @Override
+    public Response printModelDescription(String modelId) {
+        return this.printModelDescription(modelId, null);
+    }
+
+    @Override
+    public Response printModelDescription(String modelId, String language) {
+        String description = ModelFactory.getInstance().getModelDescription(modelId,language);
+        return Response.ok().entity(description).build();
+    }
+  
     /**
      * Prints the usage instructions from the requested model
      * @param modelId
@@ -197,4 +209,6 @@ public class ModelResourceImpl implements ModelResource{
             return Response.serverError().build();
         }
     }
+
+    
 }
