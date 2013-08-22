@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.reflections.Reflections;
 import no.bioforsk.vips.model.Model;
+import no.bioforsk.vips.model.ModelId;
 
 /**
  * Provides the models available. Singleton.
@@ -34,6 +35,9 @@ public class ModelFactory {
     private Map<String,Model> models;
     // Internal list of model IDs and names
     private Map<String,String> modelList;
+    // If duplicate ids found, put them here
+    private Set<String> duplicateModelIds;
+    private final static String DUPLICATE_MODEL_ID_WARNING = "ERROR: DUPLICATE MODELS EXIST FOR MODEL WITH THIS ID. CHECK SERVER LOGS.";
     
     /**
      * Declared private to protect from unauthorized instatiation. Part of the
@@ -123,9 +127,23 @@ public class ModelFactory {
                try {
                    
                    Model model = subType.newInstance();
-                   models.put(model.getModelId().toString(), model);
+                   if(models.get(model.getModelId().toString()) == null)
+                   {
+                        models.put(model.getModelId().toString(), model);
+                   }
+                   else
+                   {
+                       this.addDuplicateModelId(model.getModelId().toString());
+                       StringBuilder message = new StringBuilder()
+                               .append("Duplicate model Ids found for at least two models: ")
+                               .append("ModelId \"").append(model.getModelId()).append("\" is assigned to ")
+                               .append(model.getClass().getName())
+                               .append(" and ")
+                               .append(models.get(model.getModelId().toString()).getClass().getName());
+                       throw new DuplicateModelIdException(message.toString());
+                   }
                    //System.out.println("Model " + model.getModelName() + " with id=" + model.getModelId().toString() + " was found");
-               } catch (    InstantiationException | IllegalAccessException ex) {
+               } catch (    InstantiationException | IllegalAccessException | DuplicateModelIdException ex) {
                    Logger.getLogger(ModelFactory.class.getName()).log(Level.SEVERE, null, ex);
                }
         }
@@ -142,7 +160,8 @@ public class ModelFactory {
             this.modelList = new HashMap();
             for(Model model:this.models.values())
             {
-                this.modelList.put(model.getModelId().toString(), model.getModelName());
+                String modelName = this.isDuplicateModelId(model.getModelId().toString()) ? this.getDuplicateModelIdWarning() : model.getModelName();
+                this.modelList.put(model.getModelId().toString(), modelName);
             }
         }
         return this.modelList;
@@ -155,6 +174,10 @@ public class ModelFactory {
      * @return Description of model in requested language (Default/fallback is English)
      */
     public String getModelDescription(String modelId, String language) {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
         return language != null ? this.models.get(modelId).getModelDescription(language) : this.models.get(modelId).getModelDescription();
     }
     
@@ -165,6 +188,10 @@ public class ModelFactory {
      */
     public String getModelUsage(String modelId, String language)
     {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
         return language != null ? this.models.get(modelId).getModelUsage(language) : this.models.get(modelId).getModelUsage();
     }
     
@@ -175,11 +202,36 @@ public class ModelFactory {
      * @throws InstantiationException
      * @throws IllegalAccessException 
      */
-    public Model getModelInstance(String modelId) throws InstantiationException, IllegalAccessException
+    public Model getModelInstance(String modelId) throws InstantiationException, IllegalAccessException, DuplicateModelIdException
     {
-            return this.models.get(modelId).getClass().newInstance();
+        if(this.isDuplicateModelId(modelId))
+        {
+            throw new DuplicateModelIdException(this.getDuplicateModelIdWarning());
+        }
+        return this.models.get(modelId).getClass().newInstance();
     }
 
+    private void addDuplicateModelId(String modelId) {
+        if(this.duplicateModelIds == null)
+        {
+            this.duplicateModelIds = new HashSet();
+        }
+        this.duplicateModelIds.add(modelId);
+    }
+
+    private Set<String> getDuplicateModelIds()
+    {
+        return this.duplicateModelIds;
+    }
+    
+    private boolean isDuplicateModelId(String modelId)
+    {
+        return this.duplicateModelIds == null ? false : this.duplicateModelIds.contains(modelId);
+    }
+
+    private String getDuplicateModelIdWarning() {
+        return DUPLICATE_MODEL_ID_WARNING;
+    }
     
     
     

@@ -9,6 +9,7 @@ import no.bioforsk.vips.entity.ModelConfiguration;
 import no.bioforsk.vips.model.ConfigValidationException;
 import no.bioforsk.vips.model.Model;
 import no.bioforsk.vips.model.ModelExcecutionException;
+import no.bioforsk.vips.model.factory.DuplicateModelIdException;
 import no.bioforsk.vips.model.factory.ModelFactory;
 
 /**
@@ -62,9 +63,17 @@ public class ModelResourceImpl implements ModelResource{
             try {
                 if(first) first=false;
                 else retVal.append(",");
-                retVal.append("{");
-                retVal.append("\"modelId\":\"").append(key).append("\", \"modelName\":\"").append(mF.getModelInstance(key).getModelName(language)).append("\"");
-                retVal.append("}");
+                retVal.append("{")
+                    .append("\"modelId\":\"").append(key).append("\", \"modelName\":\"");
+                try
+                { 
+                    retVal.append(mF.getModelInstance(key).getModelName(language));
+                }
+                catch(DuplicateModelIdException ex)
+                {
+                    retVal.append(ex.getMessage());
+                }
+                retVal.append("\"").append("}");
                 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,7 +101,8 @@ public class ModelResourceImpl implements ModelResource{
         {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
-            } catch (InstantiationException | IllegalAccessException ex) {
+            } catch (InstantiationException | IllegalAccessException | DuplicateModelIdException ex) {
+                retVal.append(key).append(" ").append(ex.getMessage()).append("\n");
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
             
@@ -154,7 +164,15 @@ public class ModelResourceImpl implements ModelResource{
     public Response printModelSampleConfig(@PathParam("modelId") String modelId)
     {
         try {
-            String sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
+            String sampleConfig;
+            try
+            {
+                 sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
+            }
+            catch(DuplicateModelIdException ex)
+            {
+                sampleConfig = ex.getMessage();
+            }
             return Response.ok().entity(sampleConfig).build();
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -180,7 +198,7 @@ public class ModelResourceImpl implements ModelResource{
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | DuplicateModelIdException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().entity(ex.getMessage()).build();
@@ -206,7 +224,7 @@ public class ModelResourceImpl implements ModelResource{
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | DuplicateModelIdException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             if(ex instanceof ConfigValidationException){
