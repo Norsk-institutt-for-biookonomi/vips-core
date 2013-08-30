@@ -26,7 +26,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response printModelList()
     {
-        return this.printModelList(null);
+        return this.printModelList(Model.DEFAULT_LANGUAGE);
         
     }
     
@@ -112,7 +112,7 @@ public class ModelResourceImpl implements ModelResource{
     
     @Override
     public Response printModelDescription(String modelId) {
-        return this.printModelDescription(modelId, null);
+        return this.printModelDescription(modelId, Model.DEFAULT_LANGUAGE);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response printModelUsage(@PathParam("modelId") String modelId)
     {
-        return this.printModelUsage(modelId, null);
+        return this.printModelUsage(modelId, Model.DEFAULT_LANGUAGE);
     }
     
     /**
