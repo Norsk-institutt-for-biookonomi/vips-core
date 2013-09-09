@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.reflections.Reflections;
 import no.bioforsk.vips.model.Model;
-import no.bioforsk.vips.model.ModelId;
 
 /**
  * Provides the models available. Singleton.
