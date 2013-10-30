@@ -1,11 +1,13 @@
 package no.bioforsk.vips.core.service;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
+import no.bioforsk.vips.entity.Result;
 import no.bioforsk.vips.model.ConfigValidationException;
 import no.bioforsk.vips.model.Model;
 import no.bioforsk.vips.model.ModelExcecutionException;
@@ -222,7 +224,8 @@ public class ModelResourceImpl implements ModelResource{
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
-            return Response.ok().entity(calledModel.getResult()).build();
+            List<Result> results = calledModel.getResult();         
+            return Response.ok().entity(results).build();
         }
         catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | DuplicateModelIdException ex)
         {
