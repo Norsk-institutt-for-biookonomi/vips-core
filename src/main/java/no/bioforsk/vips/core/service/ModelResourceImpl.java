@@ -241,5 +241,16 @@ public class ModelResourceImpl implements ModelResource{
         }
     }
 
+    @Override
+    public Response printModelName(String modelId) {
+        return this.printModelName(modelId, Model.DEFAULT_LANGUAGE);
+    }
+
+    @Override
+    public Response printModelName(String modelId, String language) {
+        String name = ModelFactory.getInstance().getModelName(modelId, language);
+        return Response.ok().entity(name).build();
+    }
+
     
 }

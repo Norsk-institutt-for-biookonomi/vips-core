@@ -167,6 +167,21 @@ public class ModelFactory {
     }
     
     /**
+     * Gets the name of the model, in the appropriate language
+     * @param modelId
+     * @param language
+     * @return 
+     */
+    public String getModelName(String modelId, String language)
+    {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
+        return language != null ? this.models.get(modelId).getModelName(language) : this.models.get(modelId).getModelName();
+    }
+    
+    /**
      * 
      * @param modelId ID of the requested model
      * @param language language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
