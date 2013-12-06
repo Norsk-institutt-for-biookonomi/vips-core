@@ -183,6 +183,34 @@ public class ModelFactory {
     
     /**
      * 
+     * @param modelId
+     * @return The license for the requested model
+     */
+    public String getModelLicense(String modelId)
+    {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
+        return this.models.get(modelId).getLicense();
+    }
+    
+    /**
+     * 
+     * @param modelId
+     * @return the copyright information for the requested model
+     */
+    public String getModelCopyright(String modelId)
+    {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
+        return this.models.get(modelId).getCopyright();
+    }
+    
+    /**
+     * 
      * @param modelId ID of the requested model
      * @param language language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return Description of model in requested language (Default/fallback is English)

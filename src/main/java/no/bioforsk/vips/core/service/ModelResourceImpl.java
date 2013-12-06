@@ -187,10 +187,6 @@ public class ModelResourceImpl implements ModelResource{
      * @param config input data for the model
      * @return list of result objects
      */
-    //@POST
-    //@Path("models/run")
-    //@Consumes("application/json")
-    //@Produces("application/json")
     @Override
     public Response runModel(ModelConfiguration config)
     {
@@ -213,10 +209,6 @@ public class ModelResourceImpl implements ModelResource{
      * @param config input data for the model
      * @return list of result objects
      */
-    //@POST
-    //@Path("models/{modelId}/run")
-    //@Consumes("application/json")
-    //@Produces("application/json")
     @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
@@ -250,6 +242,18 @@ public class ModelResourceImpl implements ModelResource{
     public Response printModelName(String modelId, String language) {
         String name = ModelFactory.getInstance().getModelName(modelId, language);
         return Response.ok().entity(name).build();
+    }
+
+    @Override
+    public Response printModelLicense(String modelId) {
+        String license = ModelFactory.getInstance().getModelLicense(modelId);
+        return Response.ok().entity(license).build();
+    }
+    
+    @Override
+    public Response printModelCopyright(String modelId) {
+        String copyright = ModelFactory.getInstance().getModelCopyright(modelId);
+        return Response.ok().entity(copyright).build();
     }
 
     
