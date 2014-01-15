@@ -219,7 +219,7 @@ public class ModelResourceImpl implements ModelResource{
             List<Result> results = calledModel.getResult();         
             return Response.ok().entity(results).build();
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | DuplicateModelIdException ex)
+        catch(Exception ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             if(ex instanceof ConfigValidationException){
