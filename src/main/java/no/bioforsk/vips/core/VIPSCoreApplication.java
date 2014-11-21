@@ -25,7 +25,7 @@ import javax.ws.rs.core.Application;
 
 /**
  * Responsible for adding REST resources
- * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
+ * @copyright 2013-2014 {@link http://www.bioforsk.no Bioforsk}
  * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
  */
 @ApplicationPath("/")
@@ -56,5 +56,6 @@ public class VIPSCoreApplication extends Application
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
+        resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
     }
 }

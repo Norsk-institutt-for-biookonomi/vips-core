@@ -143,7 +143,6 @@ public class ModelFactory {
         for(Class<? extends Model> subType : subTypes)
         {
                try {
-                   
                    Model model = subType.newInstance();
                    if(models.get(model.getModelId().toString()) == null)
                    {

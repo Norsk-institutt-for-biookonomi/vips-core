@@ -22,7 +22,10 @@ package no.bioforsk.vips.core.service;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
@@ -38,6 +41,7 @@ import no.bioforsk.vips.model.factory.ModelFactory;
  * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
  * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
  */
+//@Path("") 
 public class ModelResourceImpl implements ModelResource{
      
     /**
@@ -55,9 +59,9 @@ public class ModelResourceImpl implements ModelResource{
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    //@GET
-    //@Path("models/json")
-    //@Produces("application/json;charset=UTF-8")
+    @GET
+    @Path("models/json")
+    @Produces("application/json;charset=UTF-8")
     @Override
     public Response printModelListJSON()
     {
@@ -69,9 +73,9 @@ public class ModelResourceImpl implements ModelResource{
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    //@GET
-    //@Path("models/json/{language}")
-    //@Produces("application/json;charset=UTF-8")
+    @GET
+    @Path("models/json/{language}")
+    @Produces("application/json;charset=UTF-8")
     @Override
     public Response printModelListJSON(@PathParam("language") String language)
     {
@@ -109,9 +113,9 @@ public class ModelResourceImpl implements ModelResource{
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available
      */
-    //@GET
-    //@Path("models/{language}")
-    //@Produces("text/plain;charset=UTF-8")
+    @GET
+    @Path("models/{language}")
+    @Produces("text/plain;charset=UTF-8")
     @Override
     public Response printModelList(@PathParam("language") String language)
     {
@@ -148,9 +152,9 @@ public class ModelResourceImpl implements ModelResource{
      * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return 
      */
-    //@GET
-    //@Path("models/{modelId}/usage/{language}")
-    //@Produces("text/plain;charset=UTF-8")
+    @GET
+    @Path("models/{modelId}/usage/{language}")
+    @Produces("text/plain;charset=UTF-8")
     @Override
     public Response printModelUsage(@PathParam("modelId") String modelId, @PathParam("language") String language)
     {
@@ -164,9 +168,9 @@ public class ModelResourceImpl implements ModelResource{
      * @param language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return 
      */
-    //@GET
-    //@Path("models/{modelId}/usage")
-    //@Produces("text/plain;charset=UTF-8")
+    @GET
+    @Path("models/{modelId}/usage")
+    @Produces("text/plain;charset=UTF-8")
     @Override
     public Response printModelUsage(@PathParam("modelId") String modelId)
     {
@@ -178,9 +182,9 @@ public class ModelResourceImpl implements ModelResource{
      * @param modelId the requested model
      * @return 
      */
-    //@GET
-    //@Path("models/{modelId}/sampleconfig")
-    //@Produces("text/plain;charset=UTF-8")
+    @GET
+    @Path("models/{modelId}/sampleconfig")
+    @Produces("text/plain;charset=UTF-8")
     @Override
     public Response printModelSampleConfig(@PathParam("modelId") String modelId)
     {

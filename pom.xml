@@ -26,8 +26,20 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>3.0.2.Final</version>
+      <version>3.0.9.Final</version>
       <scope>provided</scope> 
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.12</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.12</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.persistence</groupId>
@@ -44,20 +56,20 @@
     <dependency>
          <groupId>org.reflections</groupId>
          <artifactId>reflections</artifactId>
-         <version>0.9.9-RC1</version>
+         <version>0.9.9</version>
      </dependency>
     <dependency>
       <groupId>no.bioforsk.vips.common</groupId>
       <artifactId>VIPSCommon</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <!--scope>provided</scope-->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.thetransactioncompany</groupId>
       <artifactId>cors-filter</artifactId>
       <version>1.7.1</version>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>no.bioforsk.vips.model.</groupId>
       <artifactId>NaerstadModel</artifactId>
       <version>1.0-SNAPSHOT</version>
@@ -74,19 +86,20 @@
     </dependency>
     <dependency>
       <groupId>no.bioforsk.vips</groupId>
-      <artifactId>GenericPathogenPlantInfectionModel</artifactId>
+      <artifactId>GrassDryingModel</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>no.bioforsk.vips</groupId>
-      <artifactId>GrassDryingModel</artifactId>
+      <artifactId>GenericPathogenPlantInfectionModel</artifactId>
       <version>1.0-SNAPSHOT</version>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>
       <version>6.0</version>
       <type>jar</type>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
