@@ -22,11 +22,13 @@ package no.bioforsk.vips.core.service;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import no.bioforsk.vips.entity.ModelConfiguration;
 import no.bioforsk.vips.entity.Result;
@@ -35,6 +37,7 @@ import no.bioforsk.vips.model.Model;
 import no.bioforsk.vips.model.ModelExcecutionException;
 import no.bioforsk.vips.model.factory.DuplicateModelIdException;
 import no.bioforsk.vips.model.factory.ModelFactory;
+import no.bioforsk.vips.util.ServletUtil;
 
 /**
  * The available resources in this system
@@ -43,6 +46,9 @@ import no.bioforsk.vips.model.factory.ModelFactory;
  */
 //@Path("") 
 public class ModelResourceImpl implements ModelResource{
+    
+    @Context
+    HttpServletRequest servletRequest;
      
     /**
      * Lists all models available in this instance, using default language (English)
@@ -53,6 +59,19 @@ public class ModelResourceImpl implements ModelResource{
     {
         return this.printModelList(Model.DEFAULT_LANGUAGE);
         
+    }
+    
+    /**
+     * The default response if no path given
+     * @return 
+     */
+    @GET
+    @Path("")
+    @Produces("text/html")
+    @Override
+    public Response defaultResponse() 
+    {
+        return Response.ok().entity("<html><head></head><body><a href=\"" + servletRequest.getContextPath() + "/models/\">Models</a></body></html>").build();
     }
     
     /**

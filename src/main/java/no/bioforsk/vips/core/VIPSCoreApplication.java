@@ -56,5 +56,6 @@ public class VIPSCoreApplication extends Application
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
+        resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
     }
 }
