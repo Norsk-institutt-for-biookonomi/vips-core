@@ -22,8 +22,8 @@ along with VIPSCore.  If not, see <http://www.bioforsk.no/licenses/>.
     <dependencies>  
       <module name="no.bioforsk.vips.modelcontainer"/>  
       <module name="no.bioforsk.vips.VIPSCommon" export="true"/>  
-      <module name="org.codehaus.jackson.jackson-core-asl" />
-      <module name="org.codehaus.jackson.jackson-mapper-asl" />
+      <module name="com.fasterxml.jackson.core.jackson-core" />
+      <module name="com.fasterxml.jackson.core.jackson-databind" />
     </dependencies>  
   </deployment>  
 </jboss-deployment-structure> 

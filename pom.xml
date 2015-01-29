@@ -68,31 +68,6 @@
       <artifactId>cors-filter</artifactId>
       <version>1.7.1</version>
     </dependency>
-    <!--dependency>
-      <groupId>no.bioforsk.vips.model.</groupId>
-      <artifactId>NaerstadModel</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>no.bioforsk.vips.model</groupId>
-      <artifactId>AppleScabModel</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>no.bioforsk.vips.model</groupId>
-      <artifactId>OatFloweringModel</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>no.bioforsk.vips</groupId>
-      <artifactId>GrassDryingModel</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>no.bioforsk.vips</groupId>
-      <artifactId>GenericPathogenPlantInfectionModel</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency-->
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>
