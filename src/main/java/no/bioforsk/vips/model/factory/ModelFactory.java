@@ -292,6 +292,14 @@ public class ModelFactory {
     private String getDuplicateModelIdWarning() {
         return DUPLICATE_MODEL_ID_WARNING;
     }
+
+    public String getModelWarningStatusInterpretation(String modelId, String language) {
+        if(this.isDuplicateModelId(modelId))
+        {
+            return this.getDuplicateModelIdWarning();
+        }
+        return language != null ? this.models.get(modelId).getWarningStatusInterpretation(language) : this.models.get(modelId).getWarningStatusInterpretation();
+    }
     
     
     

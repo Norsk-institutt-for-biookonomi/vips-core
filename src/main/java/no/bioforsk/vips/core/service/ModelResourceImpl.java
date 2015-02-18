@@ -37,7 +37,6 @@ import no.bioforsk.vips.model.Model;
 import no.bioforsk.vips.model.ModelExcecutionException;
 import no.bioforsk.vips.model.factory.DuplicateModelIdException;
 import no.bioforsk.vips.model.factory.ModelFactory;
-import no.bioforsk.vips.util.ServletUtil;
 
 /**
  * The available resources in this system
@@ -296,6 +295,17 @@ public class ModelResourceImpl implements ModelResource{
     public Response printModelCopyright(String modelId) {
         String copyright = ModelFactory.getInstance().getModelCopyright(modelId);
         return Response.ok().entity(copyright).build();
+    }
+
+    @Override
+    public Response printModelWarningStatusInterpretation(String modelId) {
+        return this.printModelWarningStatusInterpretation(modelId, Model.DEFAULT_LANGUAGE);
+    }
+
+    @Override
+    public Response printModelWarningStatusInterpretation(String modelId, String language) {
+        String interpretation = ModelFactory.getInstance().getModelWarningStatusInterpretation(modelId,language);
+        return Response.ok().entity(interpretation).build();
     }
 
     
