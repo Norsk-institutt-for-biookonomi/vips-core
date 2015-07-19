@@ -1,23 +1,23 @@
 /*
- * Copyright (c) 2014 Bioforsk <http://www.bioforsk.no/>. 
+ * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of VIPSCore.
  * VIPSCore is free software: you can redistribute it and/or modify
- * it under the terms of the Bioforsk Open Source License as published by 
- * Bioforsk, either version 1 of the License, or (at your option) any
+ * it under the terms of the NIBIO Open Source License as published by 
+ * NIBIO, either version 1 of the License, or (at your option) any
  * later version.
  * 
  * VIPSCore is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Bioforsk Open Source License for more details.
+ * NIBIO Open Source License for more details.
  * 
- * You should have received a copy of the Bioforsk Open Source License
- * along with VIPSCore.  If not, see <http://www.bioforsk.no/licenses/>.
+ * You should have received a copy of the NIBIO Open Source License
+ * along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
  * 
  */
 
-package no.bioforsk.vips.model.factory;
+package no.nibio.vips.model.factory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.reflections.Reflections;
-import no.bioforsk.vips.model.Model;
+import no.nibio.vips.model.Model;
 
 /**
  * Provides the models available. Singleton.
@@ -34,7 +34,7 @@ import no.bioforsk.vips.model.Model;
  * <h2>Deploying models</h2>
  * To make a model available, it must
  * <ul>
- *  <li>Implement the {@link no.bioforsk.vips.model.Model} interface</li>
+ *  <li>Implement the {@link no.nibio.vips.model.Model} interface</li>
  *  <li>
  *      Be on the class path of the running application, preferably in a separate JAR.
  *      The guaranteed way to make it work is to put it inside the VIPSCore WAR-file, in /WEB-INF/lib
@@ -43,8 +43,8 @@ import no.bioforsk.vips.model.Model;
  *  </li>
  * </ul>
  * 
- * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
- * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
+ * @copyright 2013 {@link http://www.nibio.no NIBIO}
+ * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class ModelFactory {
     // The singleton instance

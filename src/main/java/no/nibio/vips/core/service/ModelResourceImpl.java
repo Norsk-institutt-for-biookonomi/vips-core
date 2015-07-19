@@ -1,24 +1,25 @@
 /*
- * Copyright (c) 2014 Bioforsk <http://www.bioforsk.no/>. 
+ * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of VIPSCore.
  * VIPSCore is free software: you can redistribute it and/or modify
- * it under the terms of the Bioforsk Open Source License as published by 
- * Bioforsk, either version 1 of the License, or (at your option) any
+ * it under the terms of the NIBIO Open Source License as published by 
+ * NIBIO, either version 1 of the License, or (at your option) any
  * later version.
  * 
  * VIPSCore is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Bioforsk Open Source License for more details.
+ * NIBIO Open Source License for more details.
  * 
- * You should have received a copy of the Bioforsk Open Source License
- * along with VIPSCore.  If not, see <http://www.bioforsk.no/licenses/>.
+ * You should have received a copy of the NIBIO Open Source License
+ * along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
  * 
  */
 
-package no.bioforsk.vips.core.service;
+package no.nibio.vips.core.service;
 
+import no.nibio.vips.core.service.ModelResource;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,18 +31,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import no.bioforsk.vips.entity.ModelConfiguration;
-import no.bioforsk.vips.entity.Result;
-import no.bioforsk.vips.model.ConfigValidationException;
-import no.bioforsk.vips.model.Model;
-import no.bioforsk.vips.model.ModelExcecutionException;
-import no.bioforsk.vips.model.factory.DuplicateModelIdException;
-import no.bioforsk.vips.model.factory.ModelFactory;
+import no.nibio.vips.entity.ModelConfiguration;
+import no.nibio.vips.entity.Result;
+import no.nibio.vips.model.ConfigValidationException;
+import no.nibio.vips.model.Model;
+import no.nibio.vips.model.ModelExcecutionException;
+import no.nibio.vips.model.factory.DuplicateModelIdException;
+import no.nibio.vips.model.factory.ModelFactory;
 
 /**
  * The available resources in this system
- * @copyright 2013 {@link http://www.bioforsk.no Bioforsk}
- * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
+ * @copyright 2013 {@link http://www.nibio.no NIBIO}
+ * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 //@Path("") 
 public class ModelResourceImpl implements ModelResource{

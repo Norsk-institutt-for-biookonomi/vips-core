@@ -1,23 +1,23 @@
 /*
- * Copyright (c) 2014 Bioforsk <http://www.bioforsk.no/>. 
+ * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of VIPSCore.
  * VIPSCore is free software: you can redistribute it and/or modify
- * it under the terms of the Bioforsk Open Source License as published by 
- * Bioforsk, either version 1 of the License, or (at your option) any
+ * it under the terms of the NIBIO Open Source License as published by 
+ * NIBIO, either version 1 of the License, or (at your option) any
  * later version.
  * 
  * VIPSCore is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * Bioforsk Open Source License for more details.
+ * NIBIO Open Source License for more details.
  * 
- * You should have received a copy of the Bioforsk Open Source License
- * along with VIPSCore.  If not, see <http://www.bioforsk.no/licenses/>.
+ * You should have received a copy of the NIBIO Open Source License
+ * along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
  * 
  */
 
-package no.bioforsk.vips.core;
+package no.nibio.vips.core;
 
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
@@ -25,8 +25,8 @@ import javax.ws.rs.core.Application;
 
 /**
  * Responsible for adding REST resources
- * @copyright 2013-2014 {@link http://www.bioforsk.no Bioforsk}
- * @author Tor-Einar Skog <tor-einar.skog@bioforsk.no>
+ * @copyright 2013-2014 {@link http://www.nibio.no NIBIO}
+ * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @ApplicationPath("/")
 public class VIPSCoreApplication extends Application
@@ -45,8 +45,8 @@ public class VIPSCoreApplication extends Application
      * @param resources 
      */
     private void addRestResourceClassesManually(Set<Class<?>> resources) {
-        resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
-        resources.add(no.bioforsk.vips.core.service.ModelResourceImpl.class);
+        resources.add(no.nibio.vips.core.config.JacksonConfig.class);
+        resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
     }
 
     /**
@@ -55,6 +55,6 @@ public class VIPSCoreApplication extends Application
      * given list with all resources defined in the project.
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(no.bioforsk.vips.core.config.JacksonConfig.class);
+        resources.add(no.nibio.vips.core.config.JacksonConfig.class);
     }
 }
