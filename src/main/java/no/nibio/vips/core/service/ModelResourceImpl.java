@@ -19,7 +19,6 @@
 
 package no.nibio.vips.core.service;
 
-import no.nibio.vips.core.service.ModelResource;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +37,7 @@ import no.nibio.vips.model.Model;
 import no.nibio.vips.model.ModelExcecutionException;
 import no.nibio.vips.model.factory.DuplicateModelIdException;
 import no.nibio.vips.model.factory.ModelFactory;
+import no.nibio.vips.model.factory.NoSuchModelException;
 
 /**
  * The available resources in this system
@@ -119,7 +119,7 @@ public class ModelResourceImpl implements ModelResource{
                 }
                 retVal.append("\"").append("}");
                 
-            } catch (InstantiationException | IllegalAccessException ex) {
+            } catch (InstantiationException | NoSuchModelException | IllegalAccessException ex) {
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
             
@@ -145,7 +145,7 @@ public class ModelResourceImpl implements ModelResource{
         {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
-            } catch (InstantiationException | IllegalAccessException | DuplicateModelIdException ex) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchModelException | DuplicateModelIdException ex) {
                 retVal.append(key).append(" ").append(ex.getMessage()).append("\n");
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -161,8 +161,15 @@ public class ModelResourceImpl implements ModelResource{
 
     @Override
     public Response printModelDescription(String modelId, String language) {
-        String description = ModelFactory.getInstance().getModelDescription(modelId,language);
-        return Response.ok().entity(description).build();
+        try
+        {
+            String description = ModelFactory.getInstance().getModelDescription(modelId,language);
+            return Response.ok().entity(description).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
   
     /**
@@ -177,8 +184,15 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response printModelUsage(@PathParam("modelId") String modelId, @PathParam("language") String language)
     {
-        String usage = ModelFactory.getInstance().getModelUsage(modelId, language);
-        return Response.ok().entity(usage).build();
+        try
+        {
+            String usage = ModelFactory.getInstance().getModelUsage(modelId, language);
+            return Response.ok().entity(usage).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
     
     /**
@@ -213,7 +227,7 @@ public class ModelResourceImpl implements ModelResource{
             {
                  sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
             }
-            catch(DuplicateModelIdException ex)
+            catch(NoSuchModelException | DuplicateModelIdException ex)
             {
                 sampleConfig = ex.getMessage();
             }
@@ -238,7 +252,7 @@ public class ModelResourceImpl implements ModelResource{
             calledModel.setConfiguration(config);
             return Response.ok().entity(calledModel.getResult()).build();
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | DuplicateModelIdException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().entity(ex.getMessage()).build();
@@ -282,20 +296,42 @@ public class ModelResourceImpl implements ModelResource{
 
     @Override
     public Response printModelName(String modelId, String language) {
-        String name = ModelFactory.getInstance().getModelName(modelId, language);
-        return Response.ok().entity(name).build();
+        try
+        {
+            String name = ModelFactory.getInstance().getModelName(modelId, language);
+            return Response.ok().entity(name).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
+        
     }
 
     @Override
     public Response printModelLicense(String modelId) {
-        String license = ModelFactory.getInstance().getModelLicense(modelId);
-        return Response.ok().entity(license).build();
+        try
+        {
+            String license = ModelFactory.getInstance().getModelLicense(modelId);
+            return Response.ok().entity(license).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
     
     @Override
     public Response printModelCopyright(String modelId) {
-        String copyright = ModelFactory.getInstance().getModelCopyright(modelId);
-        return Response.ok().entity(copyright).build();
+        try
+        {
+            String copyright = ModelFactory.getInstance().getModelCopyright(modelId);
+            return Response.ok().entity(copyright).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
 
     @Override
@@ -305,8 +341,15 @@ public class ModelResourceImpl implements ModelResource{
 
     @Override
     public Response printModelWarningStatusInterpretation(String modelId, String language) {
-        String interpretation = ModelFactory.getInstance().getModelWarningStatusInterpretation(modelId,language);
-        return Response.ok().entity(interpretation).build();
+        try
+        {
+            String interpretation = ModelFactory.getInstance().getModelWarningStatusInterpretation(modelId,language);
+            return Response.ok().entity(interpretation).build();
+        }
+        catch(NoSuchModelException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
 
     

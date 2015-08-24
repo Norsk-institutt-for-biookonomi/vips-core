@@ -151,13 +151,11 @@ public class ModelFactory {
                    else
                    {
                        this.addDuplicateModelId(model.getModelId().toString());
-                       StringBuilder message = new StringBuilder()
-                               .append("Duplicate model Ids found for at least two models: ")
-                               .append("ModelId \"").append(model.getModelId()).append("\" is assigned to ")
-                               .append(model.getClass().getName())
-                               .append(" and ")
-                               .append(models.get(model.getModelId().toString()).getClass().getName());
-                       throw new DuplicateModelIdException(message.toString());
+                       String message = "Duplicate model Ids found for at least two models: ModelId \"" 
+                               + model.getModelId() + "\" is assigned to " 
+                               + model.getClass().getName() + " and " 
+                               + models.get(model.getModelId().toString()).getClass().getName();
+                       throw new DuplicateModelIdException(message);
                    }
                    //System.out.println("Model " + model.getModelName() + " with id=" + model.getModelId().toString() + " was found");
                } catch (    InstantiationException | IllegalAccessException | DuplicateModelIdException ex) {
@@ -190,11 +188,15 @@ public class ModelFactory {
      * @param language
      * @return 
      */
-    public String getModelName(String modelId, String language)
+    public String getModelName(String modelId, String language) throws NoSuchModelException
     {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return language != null ? this.models.get(modelId).getModelName(language) : this.models.get(modelId).getModelName();
     }
@@ -204,11 +206,15 @@ public class ModelFactory {
      * @param modelId
      * @return The license for the requested model
      */
-    public String getModelLicense(String modelId)
+    public String getModelLicense(String modelId) throws NoSuchModelException
     {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return this.models.get(modelId).getLicense();
     }
@@ -218,11 +224,15 @@ public class ModelFactory {
      * @param modelId
      * @return the copyright information for the requested model
      */
-    public String getModelCopyright(String modelId)
+    public String getModelCopyright(String modelId) throws NoSuchModelException
     {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return this.models.get(modelId).getCopyright();
     }
@@ -233,10 +243,14 @@ public class ModelFactory {
      * @param language language two-letter code (<a href="http://www.loc.gov/standards/iso639-2/php/English_list.php">ISO-639-2</a>)
      * @return Description of model in requested language (Default/fallback is English)
      */
-    public String getModelDescription(String modelId, String language) {
+    public String getModelDescription(String modelId, String language) throws NoSuchModelException {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return language != null ? this.models.get(modelId).getModelDescription(language) : this.models.get(modelId).getModelDescription();
     }
@@ -246,11 +260,15 @@ public class ModelFactory {
      * @return usage instructions for the requested Model
      * 
      */
-    public String getModelUsage(String modelId, String language)
+    public String getModelUsage(String modelId, String language) throws NoSuchModelException
     {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return language != null ? this.models.get(modelId).getModelUsage(language) : this.models.get(modelId).getModelUsage();
     }
@@ -262,11 +280,19 @@ public class ModelFactory {
      * @throws InstantiationException
      * @throws IllegalAccessException 
      */
-    public Model getModelInstance(String modelId) throws InstantiationException, IllegalAccessException, DuplicateModelIdException
+    public Model getModelInstance(String modelId) throws 
+                InstantiationException, 
+                IllegalAccessException, 
+                DuplicateModelIdException, 
+                NoSuchModelException
     {
         if(this.isDuplicateModelId(modelId))
         {
             throw new DuplicateModelIdException(this.getDuplicateModelIdWarning());
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return this.models.get(modelId).getClass().newInstance();
     }
@@ -293,10 +319,14 @@ public class ModelFactory {
         return DUPLICATE_MODEL_ID_WARNING;
     }
 
-    public String getModelWarningStatusInterpretation(String modelId, String language) {
+    public String getModelWarningStatusInterpretation(String modelId, String language) throws NoSuchModelException {
         if(this.isDuplicateModelId(modelId))
         {
             return this.getDuplicateModelIdWarning();
+        }
+        if(this.models.get(modelId) == null)
+        {
+            throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
         return language != null ? this.models.get(modelId).getWarningStatusInterpretation(language) : this.models.get(modelId).getWarningStatusInterpretation();
     }
