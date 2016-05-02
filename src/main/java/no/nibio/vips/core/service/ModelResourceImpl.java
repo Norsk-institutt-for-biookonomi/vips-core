@@ -19,6 +19,8 @@
 
 package no.nibio.vips.core.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -141,7 +143,9 @@ public class ModelResourceImpl implements ModelResource{
         // test comment
         StringBuilder retVal = new StringBuilder();
         ModelFactory mF = ModelFactory.getInstance();
-        for(String key : mF.getModelList().keySet())
+        List<String> keySet = new ArrayList(mF.getModelList().keySet());
+        Collections.sort(keySet);
+        for(String key : keySet)
         {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
