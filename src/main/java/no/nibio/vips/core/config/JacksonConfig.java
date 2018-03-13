@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
+ * Copyright (c) 2018 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of VIPSCore.
  * VIPSCore is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 package no.nibio.vips.core.config;
 
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 /**
  * This config ensures that Jackson serializes dates as [ISO-8601 ]-compliant notation,
  * and not a timestamp
- * @copyright 2013 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2018 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Provider
@@ -41,6 +42,7 @@ public class JacksonConfig  implements ContextResolver<ObjectMapper>{
     {
         objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.registerModule(new JtsModule());
     }
 
     @Override

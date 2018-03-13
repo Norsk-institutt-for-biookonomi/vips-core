@@ -25,7 +25,7 @@ import javax.ws.rs.core.Application;
 
 /**
  * Responsible for adding REST resources
- * @copyright 2013-2014 {@link http://www.nibio.no NIBIO}
+ * @copyright 2013-2018 {@link http://www.nibio.no NIBIO}
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @ApplicationPath("/")
@@ -56,5 +56,6 @@ public class VIPSCoreApplication extends Application
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.nibio.vips.core.config.JacksonConfig.class);
+        resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
     }
 }
