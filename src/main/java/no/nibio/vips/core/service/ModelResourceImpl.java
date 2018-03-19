@@ -254,7 +254,12 @@ public class ModelResourceImpl implements ModelResource{
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(config.getModelId());
             calledModel.setConfiguration(config);
-            return Response.ok().entity(calledModel.getResult()).build();
+            List<Result> retVal = calledModel.getResult();
+            if(retVal != null)
+            {
+                return Response.ok().entity(calledModel.getResult()).build();
+            }
+            else throw new ModelExcecutionException("Model returned NULL Result");
         }
         catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException ex)
         {
@@ -276,8 +281,12 @@ public class ModelResourceImpl implements ModelResource{
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
-            List<Result> results = calledModel.getResult();         
-            return Response.ok().entity(results).build();
+            List<Result> results = calledModel.getResult();       
+            if(results != null)
+            {
+                return Response.ok().entity(results).build();
+            }
+            else throw new ModelExcecutionException("Model returned NULL Result");
         }
         catch(Exception ex)
         {
