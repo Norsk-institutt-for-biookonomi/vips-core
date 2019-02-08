@@ -19,6 +19,8 @@
 
 package no.nibio.vips.core.service;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +53,7 @@ public class ModelResourceImpl implements ModelResource{
     
     @Context
     HttpServletRequest servletRequest;
-     
+    
     /**
      * Lists all models available in this instance, using default language (English)
      * @return list of all models available

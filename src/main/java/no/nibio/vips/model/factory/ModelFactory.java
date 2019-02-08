@@ -135,7 +135,7 @@ public class ModelFactory {
             reflections = new Reflections(topDomain);
             subTypes.addAll(reflections.getSubTypesOf(Model.class));   
         }
-         
+                 
         /**
          * Iterates and instantiates one object for each class
          */
@@ -158,7 +158,7 @@ public class ModelFactory {
                        throw new DuplicateModelIdException(message);
                    }
                    //System.out.println("Model " + model.getModelName() + " with id=" + model.getModelId().toString() + " was found");
-               } catch (    InstantiationException | IllegalAccessException | DuplicateModelIdException ex) {
+               } catch (    InstantiationException | IllegalAccessException | DuplicateModelIdException | NoClassDefFoundError ex) {
                    Logger.getLogger(ModelFactory.class.getName()).log(Level.SEVERE, null, ex);
                }
         }
