@@ -281,11 +281,6 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
-        System.out.println("runModel 2");
-        List observations = (List) config.getConfigParameter("observations");
-        Map obs = (Map) observations.get(0);
-        System.out.println(obs.get("timeMeasured"));
-        System.out.println(obs.get("validitySignature"));
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
