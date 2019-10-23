@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -252,6 +253,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModel(ModelConfiguration config)
     {
+        System.out.println("runModel 1");
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(config.getModelId());
