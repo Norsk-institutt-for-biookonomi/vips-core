@@ -21,12 +21,16 @@ package no.nibio.vips.core.config;
 
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import net.ipmdecisions.weather.entity.LocationWeatherData;
+import no.nibio.vips.ipmdecisions.LocationWeatherDataDeserializer;
 
 /**
  * This config ensures that Jackson serializes dates as [ISO-8601 ]-compliant notation,
@@ -46,6 +50,10 @@ public class JacksonConfig  implements ContextResolver<ObjectMapper>{
         objectMapper.registerModule(new JtsModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JtsModule());
+        objectMapper.registerModule(new JavaTimeModule());
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocationWeatherData.class, new LocationWeatherDataDeserializer());
+        objectMapper.registerModule(module);
     }
 
     @Override
