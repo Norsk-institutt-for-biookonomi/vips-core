@@ -19,19 +19,13 @@
 
 package no.nibio.vips.core.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -286,9 +280,6 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
-        System.out.println("Observations are of class " + 
-                ((ArrayList)config.getConfigParameter("observations")).get(0).getClass().getName()
-        );
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
