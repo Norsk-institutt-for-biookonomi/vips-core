@@ -25,6 +25,7 @@ along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
       <module name="no.nibio.vips.VIPSCommon" export="true"/>  
       <module name="com.fasterxml.jackson.core.jackson-core" />
       <module name="com.fasterxml.jackson.core.jackson-databind" />
+      <module name="com.fasterxml.jackson.core.jackson-annotations" />
     </dependencies>  
     <exclusions>
           <module name="org.jboss.resteasy.resteasy-json-binding-provider"/>
