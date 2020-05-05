@@ -19,16 +19,19 @@
 
 package no.nibio.vips.core.service;
 
-import java.net.URL;
-import java.net.URLClassLoader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -37,6 +40,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import no.nibio.vips.entity.ModelConfiguration;
 import no.nibio.vips.entity.Result;
+import no.nibio.vips.ipmdecisions.DataTransformer;
+import no.nibio.vips.ipmdecisions.IPMDecisionsModelConfiguration;
 import no.nibio.vips.model.ConfigValidationException;
 import no.nibio.vips.model.Model;
 import no.nibio.vips.model.ModelExcecutionException;
@@ -281,6 +286,9 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
+        System.out.println("Observations are of class " + 
+                ((ArrayList)config.getConfigParameter("observations")).get(0).getClass().getName()
+        );
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
@@ -304,6 +312,20 @@ public class ModelResourceImpl implements ModelResource{
                 throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex).build());
             }
         }
+    }
+    
+    /**
+     * For input data coming from the IPM Decisions platform
+     * @param modelId
+     * @param config
+     * @return 
+     */
+    @Override
+    public Response runModelForIPMDecisions(@PathParam("modelId") String modelId, IPMDecisionsModelConfiguration config)
+    {
+        DataTransformer dt = new DataTransformer();
+        config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
+        return this.runModel(modelId, config);
     }
 
     @Override
