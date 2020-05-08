@@ -286,9 +286,6 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModel(@PathParam("modelId") String modelId, ModelConfiguration config)
     {
-        System.out.println("Observations are of class " + 
-                ((ArrayList)config.getConfigParameter("observations")).get(0).getClass().getName()
-        );
         try
         {
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
