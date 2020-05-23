@@ -314,9 +314,28 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModelForIPMDecisions(@PathParam("modelId") String modelId, IPMDecisionsModelConfiguration config)
     {
+        try
+        {
         DataTransformer dt = new DataTransformer();
         config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
-        return this.runModel(modelId, config);
+        Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
+        calledModel.setConfiguration(config);
+        List<Result> results = calledModel.getResult();  
+        return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build();
+        
+        }
+        catch(Exception ex)
+        {
+            Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            if(ex instanceof ConfigValidationException){
+            
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(ex).build());
+            }
+            else
+            {
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex).build());
+            }
+        }
     }
 
     @Override
