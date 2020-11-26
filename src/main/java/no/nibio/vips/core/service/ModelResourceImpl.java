@@ -316,13 +316,12 @@ public class ModelResourceImpl implements ModelResource{
     {
         try
         {
-        DataTransformer dt = new DataTransformer();
-        config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
-        Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
-        calledModel.setConfiguration(config);
-        List<Result> results = calledModel.getResult();  
-        return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build();
-        
+            DataTransformer dt = new DataTransformer();
+            config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
+            Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
+            calledModel.setConfiguration(config);
+            List<Result> results = calledModel.getResult();  
+            return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build();
         }
         catch(Exception ex)
         {
