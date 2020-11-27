@@ -19,19 +19,13 @@
 
 package no.nibio.vips.core.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -320,9 +314,27 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response runModelForIPMDecisions(@PathParam("modelId") String modelId, IPMDecisionsModelConfiguration config)
     {
-        DataTransformer dt = new DataTransformer();
-        config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
-        return this.runModel(modelId, config);
+        try
+        {
+            DataTransformer dt = new DataTransformer();
+            config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
+            Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
+            calledModel.setConfiguration(config);
+            List<Result> results = calledModel.getResult();  
+            return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build();
+        }
+        catch(Exception ex)
+        {
+            Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            if(ex instanceof ConfigValidationException){
+            
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(ex).build());
+            }
+            else
+            {
+                throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ex).build());
+            }
+        }
     }
 
     @Override
