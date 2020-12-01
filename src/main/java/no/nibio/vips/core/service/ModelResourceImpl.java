@@ -45,10 +45,9 @@ import no.nibio.vips.model.factory.NoSuchModelException;
 
 /**
  * The available resources in this system
- * @copyright 2013 {@link http://www.nibio.no NIBIO}
+ * @copyright 2020 {@link http://www.nibio.no NIBIO}
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-//@Path("") 
 public class ModelResourceImpl implements ModelResource{
     
     @Context
@@ -317,11 +316,19 @@ public class ModelResourceImpl implements ModelResource{
         try
         {
             DataTransformer dt = new DataTransformer();
-            config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
+            if(config.getWeatherData() != null)
+            {
+                config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
+            }
+            config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
+                    (List) config.getConfigParameter("fieldObservations"),
+                    (List) config.getConfigParameter("fieldObservationQuantifications")
+                    )
+            );
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
             List<Result> results = calledModel.getResult();  
-            return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build();
+            return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build(); 
         }
         catch(Exception ex)
         {

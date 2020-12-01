@@ -19,7 +19,6 @@
 
 package no.nibio.vips.core;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -53,6 +52,5 @@ public class VIPSCoreApplication extends Application
 
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.nibio.vips.core.config.JacksonConfig.class);
-        resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
     }
 }
