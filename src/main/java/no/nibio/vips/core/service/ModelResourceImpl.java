@@ -320,11 +320,14 @@ public class ModelResourceImpl implements ModelResource{
             {
                 config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
             }
-            config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
-                    (List) config.getConfigParameter("fieldObservations"),
-                    (List) config.getConfigParameter("fieldObservationQuantifications")
-                    )
-            );
+            if(config.getConfigParameter("fieldObservations") != null)
+            {
+                config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
+                        (List) config.getConfigParameter("fieldObservations"),
+                        (List) config.getConfigParameter("fieldObservationQuantifications")
+                        )
+                );
+            }
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
             List<Result> results = calledModel.getResult();  
