@@ -15,7 +15,7 @@ Clone and build the [VIPSCommon package](https://gitlab.nibio.no/VIPS/VIPSCommon
 
 Clone and build this project
 
-Download and install [WildFly](https://www.wildfly.org/) >= 16
+Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
 
 Deploy the build from this project in Wildfly
 
