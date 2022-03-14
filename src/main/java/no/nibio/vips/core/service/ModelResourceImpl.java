@@ -320,13 +320,18 @@ public class ModelResourceImpl implements ModelResource{
             {
                 config.setConfigParameter("observations", dt.getVIPSWeatherData(config.getWeatherData()));
             }
-            if(config.getConfigParameter("fieldObservations") != null)
+            
+            if(config.getConfigParameter("fieldObservations") != null && List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
             {
                 config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
                         (List) config.getConfigParameter("fieldObservations"),
                         (List) config.getConfigParameter("fieldObservationQuantifications")
                         )
                 );
+            }
+            else if(!List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
+            {
+            	throw new ConfigValidationException("ERROR: fieldObservations must be of type array");
             }
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
