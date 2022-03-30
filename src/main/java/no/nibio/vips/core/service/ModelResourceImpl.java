@@ -329,7 +329,7 @@ public class ModelResourceImpl implements ModelResource{
                         )
                 );
             }
-            else if(!List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
+            else if(config.getConfigParameter("fieldObservations") != null && !List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
             {
             	throw new ConfigValidationException("ERROR: fieldObservations must be of type array");
             }
