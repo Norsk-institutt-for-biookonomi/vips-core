@@ -17,7 +17,9 @@ Clone and build this project
 
 Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
 
-Deploy the build from this project in Wildfly
+Deploy the build from this project in Wildfly. 
+
+Wildfly should run on Java >= 14
 
 ### Adding models
 To add models, create this folder in WildFly:
