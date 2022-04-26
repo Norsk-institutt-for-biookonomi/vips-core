@@ -343,7 +343,7 @@ public class ModelResourceImpl implements ModelResource{
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             if(ex instanceof ConfigValidationException){
             
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(ex).build());
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build());
             }
             else
             {
