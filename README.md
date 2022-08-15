@@ -19,11 +19,11 @@ Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
 
 Deploy the build from this project in Wildfly. 
 
-Wildfly should run on Java >= 14
+Wildfly should run on Java >= 11
 
 ### Adding models
 To add models, create this folder in WildFly:
-`[WILDFLY_ROOT]/modules//no/nibio/vips/modelcontainer/main/`
+`[WILDFLY_ROOT]/modules/no/nibio/vips/modelcontainer/main/`
 Add the model jar file, and edit module.xml accordingly.
 
 ``` xml
@@ -43,6 +43,7 @@ Add the model jar file, and edit module.xml accordingly.
 		<module name="com.fasterxml.jackson.core.jackson-core" export="false"/>
 		<module name="com.fasterxml.jackson.core.jackson-databind" export="false"/>
 		<module name="com.vividsolutions.jts" export="false"/>
+		<module name="org.renjin" export="false"/>
     </dependencies>
     
 </module>
@@ -50,7 +51,6 @@ Add the model jar file, and edit module.xml accordingly.
 ```
 
 You also need to make sure you have the dependency modules available.
-
 
 
 ## Create client for a model
