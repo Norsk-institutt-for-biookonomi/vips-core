@@ -52,6 +52,8 @@ Add the model jar file, and edit module.xml accordingly.
 
 You also need to make sure you have the dependency modules available.
 
+## Implement a model
+See [implement_model.md](./docs/implement_model.md)
 
 ## Create client for a model
 See [create_client.md](./docs/create_client.md)
