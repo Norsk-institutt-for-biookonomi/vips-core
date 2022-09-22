@@ -1,7 +1,10 @@
 # VIPSCore
 This is the server component that hosts the models. It is accessible via
 VIPSCoreManager over http/REST. Models that are on the component's classpath 
-are autodetected, indexed and made available through the REST service. The service is used by [VIPSLogic](https://gitlab.nibio.no/VIPS/VIPSLogic) when running models. It can also be contacted directly by any client.
+are autodetected, indexed and made available through the REST service. The service is used by 
+[VIPSLogic](https://gitlab.nibio.no/VIPS/VIPSLogic) when running models. It can also be contacted directly by any client.
+
+VIPSCore is a part of the [VIPS platform for automatic pest prediction](https://gitlab.nibio.no/VIPS/documentation)
 
 ## VIPSCoreManager
 [VIPSCoreManager](https://gitlab.nibio.no/VIPS/VIPSCoreManager) is a layer in front of VIPSCore that handles authentication of clients and logging of usage. All services available in VIPSLogic are transparently accessible via VIPSCoreManager. Add this layer if you want to limit and log usage, and also if you want to set up e.g. scaling of VIPSCore instances.
