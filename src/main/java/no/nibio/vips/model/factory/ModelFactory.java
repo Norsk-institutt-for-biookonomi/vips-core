@@ -19,6 +19,8 @@
 
 package no.nibio.vips.model.factory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -143,7 +145,7 @@ public class ModelFactory {
         for(Class<? extends Model> subType : subTypes)
         {
                try {
-                   Model model = subType.newInstance();
+                   Model model = subType.getDeclaredConstructor().newInstance();
                    if(models.get(model.getModelId().toString()) == null)
                    {
                         models.put(model.getModelId().toString(), model);
@@ -158,7 +160,8 @@ public class ModelFactory {
                        throw new DuplicateModelIdException(message);
                    }
                    //System.out.println("Model " + model.getModelName() + " with id=" + model.getModelId().toString() + " was found");
-               } catch (    InstantiationException | IllegalAccessException | DuplicateModelIdException | NoClassDefFoundError ex) {
+               } catch (InstantiationException | IllegalAccessException | DuplicateModelIdException | NoClassDefFoundError | NoSuchMethodException |
+                        InvocationTargetException ex) {
                    Logger.getLogger(ModelFactory.class.getName()).log(Level.SEVERE, null, ex);
                }
         }
