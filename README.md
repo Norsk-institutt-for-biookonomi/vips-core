@@ -12,11 +12,19 @@ VIPSCore is a part of the [VIPS platform for automatic pest prediction](https://
 ![How VIPSCore and VIPSCoreManager fits into the whole VIPS architecture](./docs/illustrations/VIPS_whole_architecture.png "All VIPS system parts")
 
 ## Build and deploy
-You need Maven installed.
 
-Clone and build the [VIPSCommon package](https://gitlab.nibio.no/VIPS/VIPSCommon)
-
-Clone and build this project
+Clone [the code](https://gitlab.nibio.no/VIPS/VIPSCore):
+```
+$ git clone git@gitlab.nibio.no:VIPS/VIPSCore.git
+```
+The project includes [maven-wrapper](https://maven.apache.org/wrapper/), which means that you do not need Maven installed locally. Build using the wrapper script with the following command  
+```
+$ ./mvnw clean install
+```
+or on Windows
+```
+$ mvnw.cmd clean install
+```
 
 Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
 
