@@ -74,7 +74,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response defaultResponse() 
     {
-        return Response.ok().entity("<html><head></head><body><a href=\"" + servletRequest.getContextPath() + "/models/\">Models</a></body></html>").build();
+        return Response.ok().entity("<html><head></head><body><a href=\"/models/\">Models</a></body></html>").build();
     }
     
     /**
