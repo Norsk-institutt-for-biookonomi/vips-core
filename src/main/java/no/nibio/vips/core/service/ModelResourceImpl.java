@@ -88,7 +88,7 @@ public class ModelResourceImpl implements ModelResource{
     public Response printModelListJSON()
     {
         
-        return this.printModelListJSON(null);
+        return this.printModelListJSON(Model.DEFAULT_LANGUAGE);
     }
     
     /**
