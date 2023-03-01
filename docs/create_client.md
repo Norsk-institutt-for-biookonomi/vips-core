@@ -5,20 +5,20 @@ Running a model is a matter of creating a client that is able to send a POST req
 The **endpoint for running a model** is:
 
 ```
-{{vipslogic_url}}/models/{{MODEL_ID}}/run
+{{vipscore_url}}/models/{{MODEL_ID}}/run
 ```
 
 **Get the model ID** by simply connecting to
 
 ```
-{{vipslogic_url}}/models/
+{{vipscore_url}}/models/
 ```
 
 So you must create a model configuration object and pass it in the request body. Each model has its own set of input data. 
 To see a **configuration example for a specific model**, query
 
 ```
-{{vipslogic_url}}/models/{{MODEL_ID}}/sampleconfig
+{{vipscore_url}}/models/{{MODEL_ID}}/sampleconfig
 ```
 
 Here's a sample for the Carrot rust fly temperature model (PSILARTEMP)
@@ -50,7 +50,7 @@ The `"loginInfo"` property is only relevant when running the model through the V
 An explanation of the input parameters should be provided for each model from this endpoint:
 
 ```
-{{vipslogic_url}}/models/{{MODEL_ID}}/usage
+{{vipscore_url}}/models/{{MODEL_ID}}/usage
 ```
 
 If not, please contact the model provider and notify them.
@@ -112,7 +112,7 @@ Each model has its own output parameters, given in "allValues". They all provide
 The exact interpretation of the warningStatus is provided by the model, and can be read from this endpoint: 
 
 ```
-{{vipslogic_url}}/models/{{MODEL_ID}}/warningstatusinterpretation
+{{vipscore_url}}/models/{{MODEL_ID}}/warningstatusinterpretation
 ```
 
 Example from the PSILARTEMP model:
