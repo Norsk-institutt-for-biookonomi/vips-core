@@ -47,6 +47,7 @@ Add the model jar file, and edit module.xml accordingly.
 		<module name="com.fasterxml.jackson.core.jackson-databind" export="false"/>
 		<module name="com.vividsolutions.jts" export="false"/>
 		<module name="org.renjin" export="false"/>
+                <module name="org.slf4j" export="false"/>
     </dependencies>
     
 </module>
