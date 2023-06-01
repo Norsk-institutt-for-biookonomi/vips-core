@@ -327,8 +327,7 @@ public class ModelResourceImpl implements ModelResource{
             if(config.getConfigParameter("fieldObservations") != null && List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
             {
                 config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
-                        (List) config.getConfigParameter("fieldObservations"),
-                        (List) config.getConfigParameter("fieldObservationQuantifications")
+                        (List) config.getConfigParameter("fieldObservations")
                         )
                 );
             }
