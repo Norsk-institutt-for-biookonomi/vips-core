@@ -335,6 +335,10 @@ public class ModelResourceImpl implements ModelResource{
             {
             	throw new ConfigValidationException("ERROR: fieldObservations must be of type array");
             }
+            else if(config.getConfigParameter("fieldObservations") == null)
+            {
+                config.setConfigParameter("pestObservations",new ArrayList<>());
+            }
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
             List<Result> results = calledModel.getResult();  
