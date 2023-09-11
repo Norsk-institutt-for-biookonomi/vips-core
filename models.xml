@@ -1,0 +1,12 @@
+<dependencies>
+        <dependency>
+            <groupId>no.nibio.vips.model</groupId>
+            <artifactId>BremiaLactucaeModel</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>no.nibio.vips.model</groupId>
+            <artifactId>PsilaRosaeTempModel</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+</dependencies>
