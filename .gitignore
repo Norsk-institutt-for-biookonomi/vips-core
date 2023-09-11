@@ -8,3 +8,4 @@ jboss/
 /.idea/
 .vscode/settings.json
 .settings/org.eclipse.core.resources.prefs
+pom_with_models.xml

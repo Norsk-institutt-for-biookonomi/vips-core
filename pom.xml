@@ -161,7 +161,7 @@
                             <name>copyright</name>
                             <!-- copyright tag for classes and interfaces -->
                             <placement>t</placement>
-                            <head>&copy; Copyright</head>
+                            <head>Copyright</head>
                         </tag>
                     </tags>
                 </configuration>

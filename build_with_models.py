@@ -1,26 +1,57 @@
 #!/usr/bin/python3
 
+'''
+Merges pom.xml and models.xml (default) into pom_with_models.xml and 
+runs mvn clean install -f pom_with_models.xml
+
+Copyright (C) 2023 NIBIO
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+@author Tor-Einar Skog <tor-einar.skog@nibio.no>
+'''
 import sys
-from xml.dom.minidom import parse, parseString
+import subprocess
+from xml.dom.minidom import parse
 
+# Default
 models_xml_path = "models.xml"
+merged_pom_filename = "pom_with_models.xml"
 
+# Accept alternative models.xml file
 if len(sys.argv) > 1:
     models_xml_path = sys.argv[1]
 
-pom_file = open("pom.xml")
-models_file = open(models_xml_path)
+# Read contents
+pom_dom = parse("pom.xml")
+try:
+    models_dom = parse(models_xml_path)
+except FileNotFoundError:
+    print("ERROR: File %s not found." % models_xml_path)
+    exit(1)
 
-pom_dom = parse(pom_file)
-models_dom = parse(models_file)
-
-pom_deps_element = pom_dom.getElementsByTagName("dependencies")
+# Merge the dependency elements from models.xml into pom.xml
+pom_deps_element = pom_dom.getElementsByTagName("dependencies")[0]
 model_dep_elements = models_dom.getElementsByTagName("dependency")
 
 for dep in model_dep_elements:
-    pom_deps_element.append(dep)
+    pom_deps_element.appendChild(dep)
 
-print(pom_dom.toprettyxml())
+# Write the modified pom dom to file
+pom_with_models_file = open(merged_pom_filename,"w")
+pom_dom.writexml(pom_with_models_file)
+pom_with_models_file.close()
 
-models_file.close()
-pom_file.close()
+# Build VIPSCore with Maven, using the merged pom
+subprocess.run("./mvnw clean install -f %s" % merged_pom_filename, shell=True)

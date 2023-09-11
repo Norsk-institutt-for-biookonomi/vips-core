@@ -1,3 +1,4 @@
+<!-- Example alternative list of model dependencies. Copy and use according to README.md -->
 <dependencies>
         <dependency>
             <groupId>no.nibio.vips.model</groupId>

@@ -22,6 +22,8 @@ along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
     <dependencies>  
 
     </dependencies>  
-
+    <exclusions>
+          <module name="org.jboss.resteasy.resteasy-json-binding-provider"/>
+     </exclusions>
   </deployment>  
 </jboss-deployment-structure> 

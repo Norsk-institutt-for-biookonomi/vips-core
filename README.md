@@ -26,6 +26,8 @@ or on Windows
 $ mvnw.cmd clean install
 ```
 
+**PLEASE NOTE that this builds the package without any models. See "Adding models" below for more information**
+
 Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
 
 Deploy the build from this project in Wildfly. 
@@ -33,36 +35,22 @@ Deploy the build from this project in Wildfly.
 Wildfly should run on Java >= 11
 
 ### Adding models
-To add models, create this folder in WildFly:
-`[WILDFLY_ROOT]/modules/no/nibio/vips/modelcontainer/main/`
-Add the model jar file, and edit module.xml accordingly.
+Models are listed as dependencies in the POM and built into the WARfile. In order to make it possible
+to configure your own set of models to include, we have separated the model dependencies out in a 
+separate file. The default is `models.xml`, and contains the models that VIPS in Norway are using 
+currently. 
 
-``` xml
-<?xml version="1.0" encoding="UTF-8"?>
+To build the package with the default set of models, run 
 
-<!--
-  	&copy; 2019 NIBIO
-	Author: Tor-Einar Skog <tor-einar.skog@nibio.no>
-  -->
-
-<module xmlns="urn:jboss:module:1.1" name="no.nibio.vips.modelcontainer">
-    <resources>
-		<resource-root path="PsilaRosaeTempModel-1.0-SNAPSHOT.jar"/>
-    </resources>
-    <dependencies>
-		<module name="no.nibio.vips.VIPSCommon" export="false"/>
-		<module name="com.fasterxml.jackson.core.jackson-core" export="false"/>
-		<module name="com.fasterxml.jackson.core.jackson-databind" export="false"/>
-		<module name="com.vividsolutions.jts" export="false"/>
-		<module name="org.renjin" export="false"/>
-                <module name="org.slf4j" export="false"/>
-    </dependencies>
-    
-</module>
-
+```bash
+$ build_with_models.py
 ```
 
-You also need to make sure you have the dependency modules available.
+To build with your preferred set of models, create a new file called e.g. `my_models.xml` and run
+
+```bash
+$ build_with_models.py my_models.xml
+```
 
 ## Implement a model
 See [implement_model.md](./docs/implement_model.md)
