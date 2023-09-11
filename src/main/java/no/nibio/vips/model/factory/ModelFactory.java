@@ -19,7 +19,9 @@
 
 package no.nibio.vips.model.factory;
 
-import java.lang.reflect.Constructor;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.reflections.Reflections;
 import no.nibio.vips.model.Model;
 
 /**
@@ -130,13 +131,28 @@ public class ModelFactory {
          * for each TLD not found. Use application container's config to suppress
          * this in log files. 
          */
-        Reflections reflections;
+
         Set<Class<? extends Model>> subTypes = new HashSet();
-        for(String topDomain: defaultTopDomains)
+        
+        /*for(String topDomain: defaultTopDomains)
         {
             reflections = new Reflections(topDomain);
             subTypes.addAll(reflections.getSubTypesOf(Model.class));   
-        }
+        }*/
+        
+        try (ScanResult scanResult =                // Assign scanResult in try-with-resources
+        new ClassGraph()                    // Create a new ClassGraph instance
+            .verbose()                      // If you want to enable logging to stderr
+            .enableClassInfo()            // Scan classes, methods, fields, annotations
+            //.acceptPackages("com.xyz")      // Scan com.xyz and subpackages
+            .scan()) {                      // Perform the scan and return a ScanResult
+            
+            //ClassInfoList classInfoList = 
+            for(ClassInfo cInfo:scanResult.getClassesImplementing(Model.class))
+            {
+                subTypes.add(cInfo.loadClass(Model.class));
+            }
+
                  
         /**
          * Iterates and instantiates one object for each class
@@ -164,6 +180,7 @@ public class ModelFactory {
                         InvocationTargetException ex) {
                    Logger.getLogger(ModelFactory.class.getName()).log(Level.SEVERE, null, ex);
                }
+        }
         }
     }
     
