@@ -6,3 +6,5 @@ jboss/
 /.classpath
 /.project
 /.idea/
+.vscode/settings.json
+.settings/org.eclipse.core.resources.prefs
