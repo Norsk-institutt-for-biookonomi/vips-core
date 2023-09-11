@@ -74,7 +74,7 @@ public class ModelResourceImpl implements ModelResource{
     @Override
     public Response defaultResponse() 
     {
-        return Response.ok().entity("<html><head></head><body><a href=\"" + servletRequest.getContextPath() + "/models/\">Models</a></body></html>").build();
+        return Response.ok().entity("<html><head></head><body><a href=\"/models/\">Models</a></body></html>").build();
     }
     
     /**
@@ -88,7 +88,7 @@ public class ModelResourceImpl implements ModelResource{
     public Response printModelListJSON()
     {
         
-        return this.printModelListJSON(null);
+        return this.printModelListJSON(Model.DEFAULT_LANGUAGE);
     }
     
     /**
@@ -327,14 +327,17 @@ public class ModelResourceImpl implements ModelResource{
             if(config.getConfigParameter("fieldObservations") != null && List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
             {
                 config.setConfigParameter("pestObservations", dt.getVIPSPestObservations(
-                        (List) config.getConfigParameter("fieldObservations"),
-                        (List) config.getConfigParameter("fieldObservationQuantifications")
+                        (List) config.getConfigParameter("fieldObservations")
                         )
                 );
             }
             else if(config.getConfigParameter("fieldObservations") != null && !List.class.isAssignableFrom(config.getConfigParameter("fieldObservations").getClass()))
             {
             	throw new ConfigValidationException("ERROR: fieldObservations must be of type array");
+            }
+            else if(config.getConfigParameter("fieldObservations") == null)
+            {
+                config.setConfigParameter("pestObservations",new ArrayList<>());
             }
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
