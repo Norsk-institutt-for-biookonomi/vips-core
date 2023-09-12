@@ -11,11 +11,11 @@ build:
   script:
     - './mvnw $MAVEN_CLI_OPTS compile'
   tags:
-    - vips-docker
+    - vips-java
 
 test:
   stage: test
   script:
     - './mvnw $MAVEN_CLI_OPTS test'
   tags:
-    - vips-docker
+    - vips-java
