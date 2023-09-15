@@ -2,6 +2,7 @@ image: openjdk:11-jdk
 stages:
   - build
   - test
+  - deploy
 
 variables:
   COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
