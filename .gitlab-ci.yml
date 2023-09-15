@@ -1,21 +1,51 @@
-image: maven:3.8.6-openjdk-11
+image: openjdk:11-jdk
 stages:
   - build
   - test
 
 variables:
-  MAVEN_CLI_OPTS: "-s ci_settings.xml --batch-mode"
+  COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
+  COMMON_CONFIG_LOCAL: "vips-common-config"
+  SETTINGS_XML: "ci_settings.xml"
+  POM_WITH_MODELS: "pom_with_models.xml"
+  MAVEN_CLI_OPTS: "-s $SETTINGS_XML --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
+  MAIN_BRANCH: "main"
+  RELEASE_BRANCH: "release"
+
+cache:
+  paths:
+    - .m2/repository/
+
+before_script:
+  - git config --global user.name "${GITLAB_USER_NAME}"
+  - git config --global user.email "${GITLAB_USER_EMAIL}"
+  - echo "Get common settings"
+  - git clone $COMMON_CONFIG_REMOTE $COMMON_CONFIG_LOCAL
+  - cd $COMMON_CONFIG_LOCAL
+  - cp $SETTINGS_XML ../$SETTINGS_XML
+  - cd ..
+  - rm -rf $COMMON_CONFIG_LOCAL
+  - apt-get update -y && apt-get install -y python3
+  - 'python build_pom_with_models.py'
 
 build:
   stage: build
   script:
-    - './mvnw $MAVEN_CLI_OPTS compile'
+    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package'
   tags:
     - vips-java
 
 test:
   stage: test
   script:
-    - './mvnw $MAVEN_CLI_OPTS test'
+    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test'
+  tags:
+    - vips-java
+
+deploy-snapshot:
+  stage: deploy
+  script:
+    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy'
   tags:
     - vips-java
