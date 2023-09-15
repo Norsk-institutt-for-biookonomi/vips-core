@@ -8,8 +8,9 @@ variables:
   COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
   COMMON_CONFIG_LOCAL: "vips-common-config"
   SETTINGS_XML: "ci_settings.xml"
-  POM_WITH_MODELS: "pom_with_models.xml"
-  MAVEN_CLI_OPTS: "-s $SETTINGS_XML -f $POM_WITH_MODELS --batch-mode"
+  MAVEN_POM: "-f pom.xml"
+  MAVEN_POM_WITH_MODELS: "-f pom_with_models.xml"
+  MAVEN_CLI_OPTS: "-s $SETTINGS_XML --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
@@ -33,25 +34,25 @@ before_script:
 build:
   stage: build
   script:
-    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests'
+    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests'
   tags:
     - vips-java
 
 test:
   stage: test
   script:
-    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS test'
+    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test'
   tags:
     - vips-java
 
 deploy-snapshot:
   stage: deploy
   script:
-    - export VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
     - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
         echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
       fi
-    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
   tags:
     - vips-java
   rules:
@@ -75,20 +76,21 @@ deploy-release:
 
     # Set release version and deploy. Commit, tag and push.
     - &release_and_tag
+      # Change version in pom.xml - build new pom_with_models.xml
       - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot'
-      - export RELEASE_VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-      - echo "New version '$RELEASE_VERSION'"
+      - 'python build_pom_with_models.py'
+      - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - echo "New version in release '$RELEASE_VERSION'"
       - export RELEASE_TAG="v${RELEASE_VERSION}"
       - echo "Release tag '$RELEASE_TAG'"
       - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
+      - echo "Existing tags '$EXISTING_TAGS'"
       - if [ -n "$EXISTING_TAGS" ]; then
           echo "Tag $RELEASE_TAG already exists"; exit 1;
         fi
-      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+      - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
       - git add pom.xml
-      - git status
       - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
-      - git status
       - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
       - git push origin $RELEASE_TAG
       - git push origin $RELEASE_BRANCH
@@ -103,8 +105,11 @@ deploy-release:
     # Merge release branch, bump patch version, push commits.
     - &merge_and_bump
       - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
+      # Change version in pom.xml - build new pom_with_models.xml
       - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch'
-      - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - 'python build_pom_with_models.py'
+      - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - echo "New version in main '$SNAPSHOT_VERSION'"
       - git add pom.xml
       - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
       - git push origin $MAIN_BRANCH
