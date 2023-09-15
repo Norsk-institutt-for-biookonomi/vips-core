@@ -27,7 +27,7 @@ before_script:
   - cp $SETTINGS_XML ../$SETTINGS_XML
   - cd ..
   - rm -rf $COMMON_CONFIG_LOCAL
-  - apt-get update -y && apt-get install -y python3
+  - apt-get update -y && apt-get install -y python
   - 'python build_pom_with_models.py'
 
 build:
