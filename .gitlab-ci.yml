@@ -86,7 +86,9 @@ deploy-release:
         fi
       - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
       - git add pom.xml
+      - git status
       - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+      - git status
       - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
       - git push origin $RELEASE_TAG
       - git push origin $RELEASE_BRANCH
