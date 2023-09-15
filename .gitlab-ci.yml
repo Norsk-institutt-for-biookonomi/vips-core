@@ -77,10 +77,12 @@ deploy-release:
     - &release_and_tag
       - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot'
       - export RELEASE_VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - echo "New version '$RELEASE_VERSION'"
       - export RELEASE_TAG="v${RELEASE_VERSION}"
+      - echo "Release tag '$RELEASE_TAG'"
       - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
       - if [ -n "$EXISTING_TAGS" ]; then
-        echo "Tag $RELEASE_TAG already exists"; exit 1;
+          echo "Tag $RELEASE_TAG already exists"; exit 1;
         fi
       - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
       - git add pom.xml
