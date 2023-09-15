@@ -9,7 +9,7 @@ variables:
   COMMON_CONFIG_LOCAL: "vips-common-config"
   SETTINGS_XML: "ci_settings.xml"
   POM_WITH_MODELS: "pom_with_models.xml"
-  MAVEN_CLI_OPTS: "-s $SETTINGS_XML --batch-mode"
+  MAVEN_CLI_OPTS: "-s $SETTINGS_XML -f $POM_WITH_MODELS --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
@@ -33,20 +33,78 @@ before_script:
 build:
   stage: build
   script:
-    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package'
+    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests'
   tags:
     - vips-java
 
 test:
   stage: test
   script:
-    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test'
+    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS test'
   tags:
     - vips-java
 
 deploy-snapshot:
   stage: deploy
   script:
-    - './mvnw -f $POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy'
+    - export VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
+        echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
+      fi
+    - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
   tags:
     - vips-java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH'
+
+deploy-release:
+  stage: deploy
+  script:
+    # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
+    - &authenticate
+      - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+      - git remote set-url --push origin $NEW_REPO_URL
+      - git fetch origin --prune --prune-tags
+
+    # Checkout release branch
+    - &checkout_release
+      - git stash -a
+      - git checkout $RELEASE_BRANCH
+      - git reset --hard origin/$RELEASE_BRANCH
+      - git stash pop
+
+    # Set release version and deploy. Commit, tag and push.
+    - &release_and_tag
+      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot'
+      - export RELEASE_VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - export RELEASE_TAG="v${RELEASE_VERSION}"
+      - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
+      - if [ -n "$EXISTING_TAGS" ]; then
+        echo "Tag $RELEASE_TAG already exists"; exit 1;
+        fi
+      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+      - git add pom.xml
+      - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+      - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
+      - git push origin $RELEASE_TAG
+      - git push origin $RELEASE_BRANCH
+
+    # Checkout main branch
+    - &checkout_main
+      - git stash -a
+      - git checkout $MAIN_BRANCH
+      - git reset --hard origin/$MAIN_BRANCH
+      - git stash pop
+
+    # Merge release branch, bump patch version, push commits.
+    - &merge_and_bump
+      - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
+      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch'
+      - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+      - git add pom.xml
+      - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
+      - git push origin $MAIN_BRANCH
+  tags:
+    - vips-java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $RELEASE_BRANCH'
