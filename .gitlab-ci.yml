@@ -29,7 +29,7 @@ before_script:
   - cp $SETTINGS_XML ../$SETTINGS_XML
   - cd ..
   - rm -rf $COMMON_CONFIG_LOCAL
-  - apt-get update -y && apt-get install -y python
+  - apt-get update -y && apt-get install -y python && apt-get install -y rsync openssh-client
   - 'python build_pom_with_models.py'
 
 build:
@@ -49,7 +49,6 @@ test:
 deploy-to-staging:
   stage: deploy
   script:
-    - apk add --no-cache rsync openssh
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
