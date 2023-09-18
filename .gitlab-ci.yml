@@ -3,6 +3,7 @@ stages:
   - build
   - test
   - deploy
+  - upload
 
 variables:
   COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
@@ -45,21 +46,61 @@ test:
   tags:
     - vips-java
 
-deploy-snapshot:
+deploy-to-staging:
   stage: deploy
+  script:
+    - apk add --no-cache rsync openssh
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
+    - chmod 600 ~/.ssh/id_dsa
+    - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    #- echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
+    - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
+    - echo "Deploying $WAR_FILE to the server"
+    - rsync -rav --delete "$WAR_FILE" $SERVER_USER@$SERVER_IP:/home/deployer/
+  tags:
+    - vips-java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH'
+  environment:
+    name: staging
+    url: https://vipscore02test.nibio.no
+
+upload-snapshot:
+  stage: upload
   script:
     - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
     - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
         echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
       fi
     - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+    - apk add --no-cache rsync openssh
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
+    - chmod 600 ~/.ssh/id_dsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - rsync -rav --delete dist/ $SERVER_USER@$SERVER_IP:/home/deployer/frontend
   tags:
     - vips-java
   rules:
     - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH'
 
-deploy-release:
+deploy-to-production:
   stage: deploy
+  script:
+    - echo "NOT IMPLEMENTED"
+  tags:
+    - vips-java
+  only:
+    - release
+  environment:
+    name: production
+    url: https://vipscore02.nibio.no
+
+upload-and-tag-release:
+  stage: upload
   script:
     # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
     - &authenticate
