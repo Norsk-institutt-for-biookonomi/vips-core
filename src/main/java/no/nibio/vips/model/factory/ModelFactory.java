@@ -139,10 +139,10 @@ public class ModelFactory {
             reflections = new Reflections(topDomain);
             subTypes.addAll(reflections.getSubTypesOf(Model.class));   
         }*/
-        
+        boolean verboseClassGraph = System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH") != null && System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH").equals("true");
         try (ScanResult scanResult =                // Assign scanResult in try-with-resources
         new ClassGraph()                    // Create a new ClassGraph instance
-            .verbose()                      // If you want to enable logging to stderr
+            .verbose(verboseClassGraph)                      // If you want to enable logging to stderr
             .enableClassInfo()            // Scan classes, methods, fields, annotations
             //.acceptPackages("com.xyz")      // Scan com.xyz and subpackages
             .scan()) {                      // Perform the scan and return a ScanResult
