@@ -30,19 +30,19 @@ before_script:
   - cd ..
   - rm -rf $COMMON_CONFIG_LOCAL
   - apt-get update -y && apt-get install -y python && apt-get install -y rsync openssh-client
-  - 'python build_pom_with_models.py'
+  - "python build_pom_with_models.py"
 
 build:
   stage: build
   script:
-    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests'
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
   tags:
     - vips-java
 
 test:
   stage: test
   script:
-    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test'
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
   tags:
     - vips-java
 
@@ -55,7 +55,7 @@ deploy-to-staging:
     #- cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
     #- chmod 644 ~/.ssh/known_hosts
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests'
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
     - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
     - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
     - echo "Deploying $WAR_FILE to $SERVER_IP"
@@ -63,7 +63,7 @@ deploy-to-staging:
   tags:
     - vips-java
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH'
+    - if: "$CI_COMMIT_REF_NAME == $MAIN_BRANCH"
   environment:
     name: staging
     url: https://vipscore02test.nibio.no
@@ -73,19 +73,20 @@ upload-snapshot:
   script:
     - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
     - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
-        echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
+      echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
       fi
-    - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
     - apk add --no-cache rsync openssh
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - rsync -rav --delete dist/ $SERVER_USER@$SERVER_IP:/home/deployer/frontend
+
   tags:
     - vips-java
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH'
+    - if: "$CI_COMMIT_REF_NAME == $MAIN_BRANCH"
 
 deploy-to-production:
   stage: deploy
@@ -116,10 +117,9 @@ upload-and-tag-release:
       - git stash pop
 
     # Set release version and deploy. Commit, tag and push.
-    - &release_and_tag
-      # Change version in pom.xml - build new pom_with_models.xml
-      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot'
-      - 'python build_pom_with_models.py'
+    - &release_and_tag # Change version in pom.xml - build new pom_with_models.xml
+      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
+      - "python build_pom_with_models.py"
       - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
       - echo "New version in release '$RELEASE_VERSION'"
       - export RELEASE_TAG="v${RELEASE_VERSION}"
@@ -127,9 +127,9 @@ upload-and-tag-release:
       - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
       - echo "Existing tags '$EXISTING_TAGS'"
       - if [ -n "$EXISTING_TAGS" ]; then
-          echo "Tag $RELEASE_TAG already exists"; exit 1;
+        echo "Tag $RELEASE_TAG already exists"; exit 1;
         fi
-      - './mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests'
+      - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
       - git add pom.xml
       - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
       - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
@@ -147,8 +147,8 @@ upload-and-tag-release:
     - &merge_and_bump
       - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
       # Change version in pom.xml - build new pom_with_models.xml
-      - './mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch'
-      - 'python build_pom_with_models.py'
+      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch"
+      - "python build_pom_with_models.py"
       - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
       - echo "New version in main '$SNAPSHOT_VERSION'"
       - git add pom.xml
@@ -157,4 +157,4 @@ upload-and-tag-release:
   tags:
     - vips-java
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $RELEASE_BRANCH'
+    - if: "$CI_COMMIT_REF_NAME == $RELEASE_BRANCH"
