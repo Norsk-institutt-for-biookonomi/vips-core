@@ -16,7 +16,7 @@ variables:
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
   WILDFLY_PATH: "/home/wildfly"
-  TMP_PATH: "/home/wildfly/gitlab_tmp"
+  TMP_PATH: "/home/deployer/gitlab_tmp"
   ARCHIVE_PATH: "/home/wildfly/archive"
 
 cache:
