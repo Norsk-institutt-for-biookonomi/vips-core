@@ -41,8 +41,10 @@ deploy-to-staging:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
     - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
     - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
-    - echo "Deploying $WAR_FILE to $SERVER_IP"
-    - rsync -rav --delete "$WAR_FILE" $SERVER_USER@$SERVER_IP:/home/deployer/
+    - echo "Stop server"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl stop wildfly"
+    - echo "Deploying $WAR_FILE to server"
+    - scp "$WAR_FILE" $SERVER_USER@$SERVER_IP:/home/deployer/
   tags:
     - vips-java
   rules:
