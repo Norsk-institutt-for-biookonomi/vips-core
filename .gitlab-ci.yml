@@ -12,6 +12,8 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
+  DEPLOYMENT_PATH: "/home/wildfly/deployments"
+  ARCHIVE_PATH: "/home/wildfly/archive"
 
 cache:
   paths:
@@ -35,16 +37,20 @@ deploy-to-staging:
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
-    #- cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts
-    #- chmod 644 ~/.ssh/known_hosts
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
     - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
     - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
-    - echo "Stop server"
+    - echo "Stop Wildfly"
     - ssh $SERVER_USER@$SERVER_IP "sudo systemctl stop wildfly"
-    - echo "Deploying $WAR_FILE to server"
-    - scp "$WAR_FILE" $SERVER_USER@$SERVER_IP:/home/deployer/
+    - echo "Backup existing application"
+    - CURRENT_VERSION=$(ssh $SERVER_USER@$SERVER_IP "ls $DEPLOYMENT_PATH/VIPSCore-*.war | head -n 1 | sed -n 's/.*VIPSCore-\(.*\)\.war/\1/p'")
+    - TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+    - ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
+    - echo "Deploy $WAR_FILE"
+    - scp "$WAR_FILE" $SERVER_USER@$SERVER_IP:$DEPLOYMENT_PATH
+    - echo "Start Wildfly"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl start wildfly"
   tags:
     - vips-java
   rules:
