@@ -15,7 +15,8 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
-  DEPLOYMENT_PATH: "/home/wildfly/deployments"
+  WILDFLY_PATH: "/home/wildfly"
+  TMP_PATH: "/home/wildfly/gitlab_tmp"
   ARCHIVE_PATH: "/home/wildfly/archive"
 
 cache:
@@ -58,16 +59,21 @@ deploy-to-staging:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
     - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
     - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
-    - echo "Stop Wildfly"
-    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl stop wildfly"
-    - echo "Backup existing application"
+    - echo "Create temporary directory on the server"
+    - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
+    - echo "Archive currently deployed application"
     - CURRENT_VERSION=$(ssh $SERVER_USER@$SERVER_IP "ls $DEPLOYMENT_PATH/VIPSCore-*.war | head -n 1 | sed -n 's/.*VIPSCore-\(.*\)\.war/\1/p'")
     - TIMESTAMP=$(date +'%Y%m%d%H%M%S')
     - ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
-    - echo "Deploy $WAR_FILE"
-    - scp "$WAR_FILE" $SERVER_USER@$SERVER_IP:$DEPLOYMENT_PATH
-    - echo "Start Wildfly"
-    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl start wildfly"
+    - echo "Deploy $WAR_FILE using JBoss CLI"
+    - scp $WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - echo "deploy $TMP_PATH/$WAR_FILE" > deploy.cli
+    - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --connect --file=$TMP_PATH/deploy.cli"
+    - echo "Restart WildFly"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
+    - echo "Delete temporary directory"
+    - ssh $SERVER_USER@$SERVER_IP "rm -rf $TMP_PATH"
   tags:
     - vips-java
   rules:
