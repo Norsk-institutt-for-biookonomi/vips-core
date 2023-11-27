@@ -1,9 +1,6 @@
 image: openjdk:11-jdk
 stages:
-  - build
-  - test
   - deploy
-  - upload
 
 variables:
   COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
@@ -32,20 +29,6 @@ before_script:
   - apt-get update -y && apt-get install -y python && apt-get install -y rsync openssh-client
   - "python build_pom_with_models.py"
 
-build:
-  stage: build
-  script:
-    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
-  tags:
-    - vips-java
-
-test:
-  stage: test
-  script:
-    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
-  tags:
-    - vips-java
-
 deploy-to-staging:
   stage: deploy
   script:
@@ -67,94 +50,3 @@ deploy-to-staging:
   environment:
     name: staging
     url: https://vipscore02test.nibio.no
-
-upload-snapshot:
-  stage: upload
-  script:
-    - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-    - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
-      echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
-      fi
-    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
-    - apk add --no-cache rsync openssh
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
-    - chmod 600 ~/.ssh/id_dsa
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - rsync -rav --delete dist/ $SERVER_USER@$SERVER_IP:/home/deployer/frontend
-
-  tags:
-    - vips-java
-  rules:
-    - if: "$CI_COMMIT_REF_NAME == $MAIN_BRANCH"
-
-deploy-to-production:
-  stage: deploy
-  script:
-    - echo "NOT IMPLEMENTED"
-  tags:
-    - vips-java
-  only:
-    - release
-  environment:
-    name: production
-    url: https://vipscore02.nibio.no
-
-upload-and-tag-release:
-  stage: upload
-  script:
-    # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
-    - &authenticate
-      - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
-      - git remote set-url --push origin $NEW_REPO_URL
-      - git fetch origin --prune --prune-tags
-
-    # Checkout release branch
-    - &checkout_release
-      - git stash -a
-      - git checkout $RELEASE_BRANCH
-      - git reset --hard origin/$RELEASE_BRANCH
-      - git stash pop
-
-    # Set release version and deploy. Commit, tag and push.
-    - &release_and_tag # Change version in pom.xml - build new pom_with_models.xml
-      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
-      - "python build_pom_with_models.py"
-      - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-      - echo "New version in release '$RELEASE_VERSION'"
-      - export RELEASE_TAG="v${RELEASE_VERSION}"
-      - echo "Release tag '$RELEASE_TAG'"
-      - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
-      - echo "Existing tags '$EXISTING_TAGS'"
-      - if [ -n "$EXISTING_TAGS" ]; then
-        echo "Tag $RELEASE_TAG already exists"; exit 1;
-        fi
-      - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
-      - git add pom.xml
-      - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
-      - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
-      - git push origin $RELEASE_TAG
-      - git push origin $RELEASE_BRANCH
-
-    # Checkout main branch
-    - &checkout_main
-      - git stash -a
-      - git checkout $MAIN_BRANCH
-      - git reset --hard origin/$MAIN_BRANCH
-      - git stash pop
-
-    # Merge release branch, bump patch version, push commits.
-    - &merge_and_bump
-      - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
-      # Change version in pom.xml - build new pom_with_models.xml
-      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch"
-      - "python build_pom_with_models.py"
-      - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-      - echo "New version in main '$SNAPSHOT_VERSION'"
-      - git add pom.xml
-      - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
-      - git push origin $MAIN_BRANCH
-  tags:
-    - vips-java
-  rules:
-    - if: "$CI_COMMIT_REF_NAME == $RELEASE_BRANCH"
