@@ -15,8 +15,8 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
-  WILDFLY_PATH: "/home/wildfly"
   TMP_PATH: "/home/deployer/gitlab_tmp"
+  DEPLOYMENT_PATH: "/home/wildfly/deployments"
   ARCHIVE_PATH: "/home/wildfly/archive"
 
 cache:
