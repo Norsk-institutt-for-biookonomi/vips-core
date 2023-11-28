@@ -63,11 +63,12 @@ deploy-to-staging:
     - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
     - echo "Archive currently deployed application"
     - CURRENT_VERSION=$(ssh $SERVER_USER@$SERVER_IP "ls $DEPLOYMENT_PATH/VIPSCore-*.war | head -n 1 | sed -n 's/.*VIPSCore-\(.*\)\.war/\1/p'")
-    - if [ -n "$CURRENT_VERSION" ]; then
-      TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-      ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
+    - |
+      if [ -n "$CURRENT_VERSION" ]; then
+        TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+        ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
       else
-      echo "No matching file found. Skipping archive step."
+        echo "No matching file found. Skipping archive step."
       fi
     - echo "Deploy $WAR_FILE using JBoss CLI"
     - scp $WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
