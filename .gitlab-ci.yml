@@ -63,13 +63,17 @@ deploy-to-staging:
     - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
     - echo "Archive currently deployed application"
     - CURRENT_VERSION=$(ssh $SERVER_USER@$SERVER_IP "ls $DEPLOYMENT_PATH/VIPSCore-*.war | head -n 1 | sed -n 's/.*VIPSCore-\(.*\)\.war/\1/p'")
-    - TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-    - ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
+    - if [ -n "$CURRENT_VERSION" ]; then
+      TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+      ssh $SERVER_USER@$SERVER_IP "mv $DEPLOYMENT_PATH/VIPSCore-${CURRENT_VERSION}.war $ARCHIVE_PATH/VIPSCore-${CURRENT_VERSION}-${TIMESTAMP}.war"
+      else
+      echo "No matching file found. Skipping archive step."
+      fi
     - echo "Deploy $WAR_FILE using JBoss CLI"
     - scp $WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
     - echo "deploy $TMP_PATH/$WAR_FILE" > deploy.cli
     - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
-    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --connect --file=$TMP_PATH/deploy.cli"
+    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli"
     - echo "Restart WildFly"
     - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
     - echo "Delete temporary directory"
