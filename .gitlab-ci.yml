@@ -57,8 +57,8 @@ deploy-to-staging:
     - chmod 600 ~/.ssh/id_dsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
-    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1)
-    - if [ -z "$WAR_FILE" ]; then echo "No WAR files found in target directory"; exit 1; fi
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1 | xargs basename)
+    - if [ -z "$WAR_FILE" ]; then echo "No war file found in target directory"; exit 1; fi
     - echo "Create temporary directory on the server"
     - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
     - echo "Archive currently deployed application"
@@ -71,7 +71,7 @@ deploy-to-staging:
         echo "No matching file found. Skipping archive step."
       fi
     - echo "Deploy $WAR_FILE using JBoss CLI"
-    - scp $WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - scp target/$WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
     - echo "deploy $TMP_PATH/$WAR_FILE" > deploy.cli
     - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
     - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli"
