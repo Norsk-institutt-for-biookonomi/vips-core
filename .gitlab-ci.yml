@@ -72,7 +72,7 @@ deploy-to-staging:
       fi
     - echo "Deploy $WAR_FILE using JBoss CLI"
     - scp target/$WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
-    - echo "deploy $TMP_PATH/$WAR_FILE" > deploy.cli
+    - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
     - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
     - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli"
     - echo "Restart WildFly"
