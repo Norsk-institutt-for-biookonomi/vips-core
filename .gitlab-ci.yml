@@ -44,9 +44,9 @@ build:
   artifacts:
     paths:
       - target/*.war
-  only:
-    - $MAIN_BRANCH
-    - $RELEASE_BRANCH
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
 
 test:
   stage: test
@@ -54,9 +54,9 @@ test:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
   tags:
     - vips-java
-  only:
-    - $MAIN_BRANCH
-    - $RELEASE_BRANCH
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
 
 deploy-to-staging:
   stage: deploy
@@ -99,7 +99,7 @@ deploy-to-staging:
   tags:
     - vips-java
   rules:
-    - if: "$CI_COMMIT_REF_NAME == $MAIN_BRANCH"
+    - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
   environment:
     name: staging
     url: https://vipscore02test.nibio.no
@@ -115,7 +115,7 @@ upload-snapshot:
   tags:
     - vips-java
   rules:
-    - if: "$CI_COMMIT_REF_NAME == $MAIN_BRANCH"
+    - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
 
 deploy-to-production:
   stage: deploy
@@ -186,4 +186,4 @@ upload-and-tag-release:
   tags:
     - vips-java
   rules:
-    - if: "$CI_COMMIT_REF_NAME == $RELEASE_BRANCH"
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
