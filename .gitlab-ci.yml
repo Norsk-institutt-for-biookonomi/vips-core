@@ -44,6 +44,9 @@ build:
   artifacts:
     paths:
       - target/*.war
+  only:
+    - $MAIN_BRANCH
+    - $RELEASE_BRANCH
 
 test:
   stage: test
@@ -51,6 +54,9 @@ test:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
   tags:
     - vips-java
+  only:
+    - $MAIN_BRANCH
+    - $RELEASE_BRANCH
 
 deploy-to-staging:
   stage: deploy
