@@ -99,6 +99,19 @@ deploy-to-staging:
     name: staging
     url: https://vipscore02test.nibio.no
 
+upload-snapshot:
+  stage: upload
+  script:
+    - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
+      echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
+      fi
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
+  tags:
+    - vips-java
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
+
 deploy-to-production:
   stage: deploy
   script:
