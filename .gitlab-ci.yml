@@ -87,7 +87,7 @@ deploy-to-staging:
       fi
     # Deploy war file using JBoss CLI and credentials given in CI/CD variables
     - echo "Deploy $WAR_FILE using JBoss CLI"
-    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli"
+    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli" > deployment.log 2>&1
     # Restart should not be necessary
     - echo "Restart WildFly"
     - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
