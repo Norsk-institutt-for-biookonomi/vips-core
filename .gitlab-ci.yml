@@ -67,9 +67,9 @@ debug-cli:
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | grep VIPSCore.*war")
+    - CURRENTLY_DEPLOYED=$(ssh deployer@128.39.192.192 "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | grep VIPSCore.*war")
     - echo $CURRENTLY_DEPLOYED
-    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
+    - ssh deployer@128.39.192.192 "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
   tags:
     - vips-java
   rules:
