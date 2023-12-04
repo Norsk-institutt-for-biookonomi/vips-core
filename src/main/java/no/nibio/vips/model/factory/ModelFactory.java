@@ -1,20 +1,19 @@
 /*
  * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
- * 
- * This file is part of VIPSCore.
- * VIPSCore is free software: you can redistribute it and/or modify
- * it under the terms of the NIBIO Open Source License as published by 
- * NIBIO, either version 1 of the License, or (at your option) any
- * later version.
- * 
- * VIPSCore is distributed in the hope that it will be useful,
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * NIBIO Open Source License for more details.
- * 
- * You should have received a copy of the NIBIO Open Source License
- * along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
- * 
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package no.nibio.vips.model.factory;
@@ -139,10 +138,10 @@ public class ModelFactory {
             reflections = new Reflections(topDomain);
             subTypes.addAll(reflections.getSubTypesOf(Model.class));   
         }*/
-        
+        boolean verboseClassGraph = System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH") != null && System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH").equals("true");
         try (ScanResult scanResult =                // Assign scanResult in try-with-resources
         new ClassGraph()                    // Create a new ClassGraph instance
-            .verbose()                      // If you want to enable logging to stderr
+            .verbose(verboseClassGraph)                      // If you want to enable logging to stderr
             .enableClassInfo()            // Scan classes, methods, fields, annotations
             //.acceptPackages("com.xyz")      // Scan com.xyz and subpackages
             .scan()) {                      // Perform the scan and return a ScanResult
