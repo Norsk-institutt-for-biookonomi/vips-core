@@ -1,7 +1,6 @@
 # VIPSCore
 
-This is the server component that hosts the models. It is accessible via
-VIPSCoreManager over http/REST. Models that are on the component's classpath
+This is the server component that hosts the models. It is accessible via VIPSCoreManager over http/REST. Models that are on the component's classpath
 are autodetected, indexed and made available through the REST service. The service is used by
 [VIPSLogic](https://gitlab.nibio.no/VIPS/VIPSLogic) when running models. It can also be contacted directly by any client.
 
