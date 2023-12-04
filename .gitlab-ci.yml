@@ -77,7 +77,7 @@ deploy-to-staging:
     - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
     - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
     # Find name of currently deployed application. Undeploy.
-    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | grep VIPSCore.*war")
+    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | grep VIPSCore-.*war")
     - echo $CURRENTLY_DEPLOYED
     - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
     # Deploy war file using JBoss CLI and credentials given in CI/CD variables
@@ -115,11 +115,39 @@ upload-snapshot:
 deploy-to-production:
   stage: deploy
   script:
-    - echo "NOT IMPLEMENTED"
+    # Authentication setup
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
+    - chmod 600 ~/.ssh/id_dsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    # Find name of war file in target folder (built previously in build stage), exit if none exists
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1 | xargs basename)
+    - if [ -z "$WAR_FILE" ]; then echo "No war file found in target directory"; exit 1; fi
+    # Create temporary directory on server, copy war file and deployment script there
+    - echo "Create temporary directory on the server"
+    - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
+    - scp target/$WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
+    - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
+    # Find name of currently deployed application. Undeploy.
+    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | grep VIPSCore-.*war")
+    - echo $CURRENTLY_DEPLOYED
+    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
+    # Deploy war file using JBoss CLI and credentials given in CI/CD variables
+    - echo "Deploy $WAR_FILE using JBoss CLI"
+    - ssh $SERVER_USER@$SERVER_IP "/disks/data01/wildfly/wildfly-25.0.1.Final/bin/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli" > deployment.log 2>&1
+    # Restart should not be necessary
+    - echo "Restart WildFly"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
+    # Delete temporary directory on server
+    - echo "Delete temporary directory"
+    - ssh $SERVER_USER@$SERVER_IP "rm -rf $TMP_PATH"
+  after_script:
+    - echo "Deployment complete"
   tags:
     - vips-java
-  only:
-    - release
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
   environment:
     name: production
     url: https://vipscore02.nibio.no
