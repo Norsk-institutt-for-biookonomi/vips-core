@@ -341,6 +341,7 @@ public class ModelResourceImpl implements ModelResource{
             Model calledModel = ModelFactory.getInstance().getModelInstance(modelId);
             calledModel.setConfiguration(config);
             List<Result> results = calledModel.getResult();  
+            //results.forEach(x->System.out.println(x.toString()));
             return Response.ok().entity(dt.getIPMDecisionsModelOutput(results)).build(); 
         }
         catch(Exception ex)
