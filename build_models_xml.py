@@ -33,22 +33,24 @@ if response.status_code == 200:
 
 models = {}
 
-model_prefix = "no/nibio/vips/model/"
+model_prefixes = ["no/nibio/vips/model","fi/luke/vips/model"]
 
 for package in all_packages:
-    if package["name"].find(model_prefix) >=0 and ((snapshot and package["version"].find("SNAPSHOT")>=0) or (not snapshot and package["version"].find("SNAPSHOT")<0)):
-        model_name = package["name"][len(model_prefix):]
-        if models.get(model_name, None) == None:
-            models[model_name] = {}
-            models[model_name]["version"] = package["version"]
-        else:
-            models[model_name]["version"] = package["version"] if package["version"] > models[model_name]["version"] else models[model_name]["version"]
+    for model_prefix in model_prefixes:
+        if package["name"].find(model_prefix) >=0 and ((snapshot and package["version"].find("SNAPSHOT")>=0) or (not snapshot and package["version"].find("SNAPSHOT")<0)):
+            model_name = package["name"][len(model_prefix) + 1:]
+            if models.get(model_name, None) == None:
+                models[model_name] = {}
+                models[model_name]["groupId"] = model_prefix.replace("/",".")
+                models[model_name]["version"] = package["version"]
+            else:
+                models[model_name]["version"] = package["version"] if package["version"] > models[model_name]["version"] else models[model_name]["version"]
 
 # Build partial Maven XML
 dependencies = ET.Element("dependencies")
 for model_name, value in models.items():
     dependency = ET.SubElement(dependencies, "dependency")
-    ET.SubElement(dependency,"groupId").text = "no.nibio.vips.model"
+    ET.SubElement(dependency,"groupId").text = value["groupId"]
     ET.SubElement(dependency, "artifactId").text = model_name
     ET.SubElement(dependency, "version").text = value["version"]
     #print("%s %s" % (model_name, value["version"]))
