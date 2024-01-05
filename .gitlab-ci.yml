@@ -34,8 +34,8 @@ before_script:
   - cp $SETTINGS_XML ../$SETTINGS_XML
   - cd ..
   - rm -rf $COMMON_CONFIG_LOCAL
-  - apt-get update -y && apt-get install -y python && apt-get install -y rsync openssh-client
-  - "python build_pom_with_models.py"
+  - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
+  - "python3 build_pom_with_models.py"
 
 build:
   stage: build
