@@ -34,11 +34,11 @@ $ mvnw.cmd clean install
 
 **PLEASE NOTE that this builds the package without any models. See "Adding models" below for more information**
 
-Download and install [WildFly](https://www.wildfly.org/) >= 25.0.1
+Download and install [WildFly](https://www.wildfly.org/) == 26.1.3
 
 Deploy the build from this project in Wildfly.
 
-Wildfly should run on Java >= 11
+Wildfly should run on Java >= 17
 
 ### Adding models
 
@@ -57,6 +57,17 @@ To build with your preferred set of models, create a new file called e.g. `my_mo
 
 ```bash
 $ build_with_models.py my_models.xml
+```
+
+To create Maven `<dependencies/>` XML with the latest versions of all models on NIBIO's GitLab, use the `build_models_xml.py` script, like this:
+
+```bash
+# Write latest production version dependency elements XML to my_models.xml
+$ ./build_models_xml.py > my_models.xml
+
+# Write latest SNAPSHOT version dependency elements XML to my_models.xml
+$ ./build_models_xml.py -s > my_models.xml
+
 ```
 
 ## Implement a model

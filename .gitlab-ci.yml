@@ -1,4 +1,4 @@
-image: openjdk:11-jdk
+image: eclipse-temurin:17.0.9_9-jdk-jammy
 stages:
   - build
   - test
@@ -15,7 +15,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
-  CLI_PATH: "/disks/data01/wildfly/wildfly-25.0.1.Final/bin"
+  CLI_PATH: "/disks/data01/wildfly/wildfly-26.1.3.Final/bin"
   TMP_PATH: "/home/deployer/gitlab_tmp"
   DEPLOYMENT_PATH: "/home/wildfly/deployments"
   ARCHIVE_PATH: "/home/wildfly/archive"
@@ -25,6 +25,7 @@ cache:
     - .m2/repository/
 
 before_script:
+  - apt-get update && apt-get install -y git
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - echo "Get common settings"
@@ -33,8 +34,8 @@ before_script:
   - cp $SETTINGS_XML ../$SETTINGS_XML
   - cd ..
   - rm -rf $COMMON_CONFIG_LOCAL
-  - apt-get update -y && apt-get install -y python && apt-get install -y rsync openssh-client
-  - "python build_pom_with_models.py"
+  - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
+  - "python3 build_pom_with_models.py"
 
 build:
   stage: build
