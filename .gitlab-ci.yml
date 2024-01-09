@@ -173,7 +173,7 @@ upload-and-tag-release:
     # Set release version and deploy. Commit, tag and push.
     - &release_and_tag # Change version in pom.xml - build new pom_with_models.xml
       - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
-      - "python build_pom_with_models.py"
+      - "python3 build_pom_with_models.py"
       - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
       - echo "New version in release '$RELEASE_VERSION'"
       - export RELEASE_TAG="v${RELEASE_VERSION}"
