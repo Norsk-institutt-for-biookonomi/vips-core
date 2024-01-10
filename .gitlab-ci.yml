@@ -81,9 +81,12 @@ build-for-production:
       fi
     # If release tag does not already exist, commit and push pom with new version
     - git add pom.xml
-    # Check if there are any changes staged for commit
-    - if ! git diff --cached --quiet; then
-      git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"; git push origin $RELEASE_BRANCH
+    - |
+      if git diff --cached --quiet -- pom.xml; then
+          echo "No changes to commit for pom.xml, skipping commit and push"
+      else
+          git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+          git push origin $RELEASE_BRANCH
       fi
     # Build new war file
     - echo "Build war file with version '$RELEASE_VERSION'"
