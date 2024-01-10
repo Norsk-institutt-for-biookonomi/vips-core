@@ -30,9 +30,7 @@ before_script:
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - echo "Get common settings"
   - git clone $COMMON_CONFIG_REMOTE $COMMON_CONFIG_LOCAL
-  - cd $COMMON_CONFIG_LOCAL
-  - cp $SETTINGS_XML ../$SETTINGS_XML
-  - cd ..
+  - cp $COMMON_CONFIG_LOCAL/$SETTINGS_XML .
   - rm -rf $COMMON_CONFIG_LOCAL
   - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
   - "python3 build_pom_with_models.py"
@@ -218,6 +216,7 @@ upload-and-tag-release:
     - git stash pop
 
     # Set release version and deploy. Commit, tag and push.
+    - "python3 build_pom_with_models.py"
     - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
     - export RELEASE_TAG="v${RELEASE_VERSION}"
     - echo "Version to deploy '$RELEASE_VERSION', will be tagged '$RELEASE_TAG'"
