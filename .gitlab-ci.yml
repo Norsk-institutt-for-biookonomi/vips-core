@@ -81,9 +81,12 @@ build-for-production:
       fi
     # If release tag does not already exist, commit and push pom with new version
     - git add pom.xml
-    - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
-    - git push origin $RELEASE_BRANCH
-
+    # Check if there are any changes staged for commit
+    - |
+      if ! git diff --cached --quiet; then
+      - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+      - git push origin $RELEASE_BRANCH
+      fi
     # Build new war file
     - echo "Build war file with version '$RELEASE_VERSION'"
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
@@ -123,9 +126,9 @@ deploy-to-staging:
     - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
     - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
     # Find name of currently deployed application. Undeploy.
-    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | tr ' ' '\n'  | grep VIPSCore-.*war")
-    - echo $CURRENTLY_DEPLOYED
-    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
+    #- CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | tr ' ' '\n'  | grep VIPSCore-.*war")
+    #- echo $CURRENTLY_DEPLOYED
+    #- ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
     # Deploy war file using JBoss CLI and credentials given in CI/CD variables
     - echo "Deploy $WAR_FILE using JBoss CLI"
     - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli" > deployment.log 2>&1
