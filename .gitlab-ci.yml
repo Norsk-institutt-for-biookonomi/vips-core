@@ -37,7 +37,7 @@ before_script:
   - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
   - "python3 build_pom_with_models.py"
 
-build:
+build-for-staging:
   stage: build
   script:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
@@ -48,6 +48,51 @@ build:
       - target/*.war
   rules:
     - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
+
+build-for-production:
+  stage: build
+  script:
+    # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
+    # This is necessary in order to push changes to git
+    - &authenticate
+      - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+      - git remote set-url --push origin $NEW_REPO_URL
+      - git fetch origin --prune --prune-tags
+
+    # Checkout release branch
+    - &checkout_release
+      - git stash -a
+      - git checkout $RELEASE_BRANCH
+      - git reset --hard origin/$RELEASE_BRANCH
+      - git stash pop
+
+    # Set release version. Commit and push if tag for release version does not already exist.
+    - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
+    - "python3 build_pom_with_models.py"
+    - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - echo "New version in release '$RELEASE_VERSION'"
+    # If tag for new release version already exist, exit with error
+    - export RELEASE_TAG="v${RELEASE_VERSION}"
+    - echo "Release tag '$RELEASE_TAG'"
+    - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
+    - echo "Existing tags '$EXISTING_TAGS'"
+    - if [ -n "$EXISTING_TAGS" ]; then
+      echo "Tag $RELEASE_TAG already exists"; exit 1;
+      fi
+    # If release tag does not already exist, commit and push pom with new version
+    - git add pom.xml
+    - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+    - git push origin $RELEASE_BRANCH
+
+    # Build new war file
+    - echo "Build war file with version '$RELEASE_VERSION'"
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
+  tags:
+    - vips-java
+  artifacts:
+    paths:
+      - target/*.war
+  rules:
     - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
 
 test:
@@ -116,7 +161,7 @@ upload-snapshot:
 deploy-to-production:
   stage: deploy
   script:
-    # Authentication setup
+    # Authentication setup, for running commands on server
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
@@ -157,56 +202,52 @@ upload-and-tag-release:
   stage: upload
   script:
     # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
-    - &authenticate
-      - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
-      - git remote set-url --push origin $NEW_REPO_URL
-      - git fetch origin --prune --prune-tags
+    # This is necessary in order to push changes to git
+    - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    - git remote set-url --push origin $NEW_REPO_URL
+    - git fetch origin --prune --prune-tags
 
     # Checkout release branch
-    - &checkout_release
-      - git stash -a
-      - git checkout $RELEASE_BRANCH
-      - git reset --hard origin/$RELEASE_BRANCH
-      - git stash pop
+    - git stash -a
+    - git checkout $RELEASE_BRANCH
+    - git reset --hard origin/$RELEASE_BRANCH
+    - git stash pop
 
     # Set release version and deploy. Commit, tag and push.
-    - &release_and_tag # Change version in pom.xml - build new pom_with_models.xml
-      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
-      - "python3 build_pom_with_models.py"
-      - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-      - echo "New version in release '$RELEASE_VERSION'"
-      - export RELEASE_TAG="v${RELEASE_VERSION}"
-      - echo "Release tag '$RELEASE_TAG'"
-      - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
-      - echo "Existing tags '$EXISTING_TAGS'"
-      - if [ -n "$EXISTING_TAGS" ]; then
-        echo "Tag $RELEASE_TAG already exists"; exit 1;
-        fi
-      - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
-      - git add pom.xml
-      - git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
-      - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
-      - git push origin $RELEASE_TAG
-      - git push origin $RELEASE_BRANCH
+    - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - export RELEASE_TAG="v${RELEASE_VERSION}"
+    - echo "Version to deploy '$RELEASE_VERSION', will be tagged '$RELEASE_TAG'"
+
+    # Find name of war file in target folder (built previously in build stage), exit if none exists
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1 | xargs basename)
+    - if [ -z "$WAR_FILE" ]; then echo "No war file found in target directory"; exit 1; fi
+    - echo "War file built in build job '$WAR_FILE'"
+
+    # Old way of deploying newly built war:
+    # - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
+
+    # TRY THIS - MIGHT NOT WORK DUE TO MISSING repositoryId and url - https://maven.apache.org/guides/mini/guide-3rd-party-jars-remote.html
+    - "./mvnw deploy:deploy-file -DpomFile=pom.xml -Dfile=target/$WAR_FILE"
+
+    - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
+    - git push origin $RELEASE_TAG
 
     # Checkout main branch
-    - &checkout_main
-      - git stash -a
-      - git checkout $MAIN_BRANCH
-      - git reset --hard origin/$MAIN_BRANCH
-      - git stash pop
+    - git stash -a
+    - git checkout $MAIN_BRANCH
+    - git reset --hard origin/$MAIN_BRANCH
+    - git stash pop
 
     # Merge release branch, bump patch version, push commits.
-    - &merge_and_bump
-      - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
-      # Change version in pom.xml - build new pom_with_models.xml
-      - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch"
-      - "python3 build_pom_with_models.py"
-      - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
-      - echo "New version in main '$SNAPSHOT_VERSION'"
-      - git add pom.xml
-      - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
-      - git push origin $MAIN_BRANCH
+    - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
+    # Change version in pom.xml - build new pom_with_models.xml
+    - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch"
+    - "python3 build_pom_with_models.py"
+    - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - echo "New version in main '$SNAPSHOT_VERSION'"
+    - git add pom.xml
+    - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
+    - git push origin $MAIN_BRANCH
   tags:
     - vips-java
   rules:
