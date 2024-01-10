@@ -230,7 +230,7 @@ upload-and-tag-release:
     # - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
 
     # TRY THIS - MIGHT NOT WORK DUE TO MISSING repositoryId and url - https://maven.apache.org/guides/mini/guide-3rd-party-jars-remote.html
-    - "./mvnw deploy:deploy-file -DpomFile=pom.xml -Dfile=target/$WAR_FILE"
+    - "./mvnw deploy:deploy-file -DpomFile=pom.xml -Dfile=target/$WAR_FILE -Durl=$MAVEN_PACKAGE_REGISTRY"
 
     - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
     - git push origin $RELEASE_TAG
