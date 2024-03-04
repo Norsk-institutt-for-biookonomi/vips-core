@@ -40,7 +40,7 @@ build-for-staging:
   script:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
   tags:
-    - vips-java
+    - java
   artifacts:
     paths:
       - target/*.war
@@ -90,7 +90,7 @@ build-for-production:
     - echo "Build war file with version '$RELEASE_VERSION'"
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
   tags:
-    - vips-java
+    - java
   artifacts:
     paths:
       - target/*.war
@@ -102,7 +102,7 @@ test:
   script:
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
   tags:
-    - vips-java
+    - java
   rules:
     - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
     - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
@@ -140,7 +140,7 @@ deploy-to-staging:
   after_script:
     - echo "Deployment complete"
   tags:
-    - vips-java
+    - java
   rules:
     - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
   environment:
@@ -156,7 +156,7 @@ upload-snapshot:
       fi
     - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
   tags:
-    - vips-java
+    - java
   rules:
     - if: $CI_COMMIT_REF_NAME == $MAIN_BRANCH
 
@@ -193,7 +193,7 @@ deploy-to-production:
   after_script:
     - echo "Deployment complete"
   tags:
-    - vips-java
+    - java
   rules:
     - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
   environment:
@@ -242,6 +242,6 @@ upload-and-tag-release:
     - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
     - git push origin $MAIN_BRANCH
   tags:
-    - vips-java
+    - java
   rules:
     - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
