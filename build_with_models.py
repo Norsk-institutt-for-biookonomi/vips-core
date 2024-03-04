@@ -49,7 +49,7 @@ for dep in model_dep_elements:
     pom_deps_element.appendChild(dep)
 
 # Write the modified pom dom to file
-pom_with_models_file = open(merged_pom_filename,"w")
+pom_with_models_file = open(merged_pom_filename, "w")
 pom_dom.writexml(pom_with_models_file)
 pom_with_models_file.close()
 
