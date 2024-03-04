@@ -59,16 +59,16 @@ if response.status_code == 200:
 
 models = {}
 
-model_prefixes = ["no/nibio/vips/model","fi/luke/vips/model"]
+model_prefixes = ["no/nibio/vips/model", "fi/luke/vips/model"]
 
 # Filter models and store only the most recent version (highest alphanumeric number)
 for package in all_packages:
     for model_prefix in model_prefixes:
-        if package["name"].find(model_prefix) >=0 and ((snapshot and package["version"].find("SNAPSHOT")>=0) or (not snapshot and package["version"].find("SNAPSHOT")<0)):
+        if package["name"].find(model_prefix) >= 0 and ((snapshot and package["version"].find("SNAPSHOT") >= 0) or (not snapshot and package["version"].find("SNAPSHOT") < 0)):
             model_name = package["name"][len(model_prefix) + 1:]
-            if models.get(model_name, None) == None:
+            if models.get(model_name, None) is None:
                 models[model_name] = {}
-                models[model_name]["groupId"] = model_prefix.replace("/",".")
+                models[model_name]["groupId"] = model_prefix.replace("/", ".")
                 models[model_name]["version"] = package["version"]
             else:
                 models[model_name]["version"] = package["version"] if package["version"] > models[model_name]["version"] else models[model_name]["version"]
@@ -77,11 +77,11 @@ for package in all_packages:
 dependencies = ET.Element("dependencies")
 for model_name, value in models.items():
     dependency = ET.SubElement(dependencies, "dependency")
-    ET.SubElement(dependency,"groupId").text = value["groupId"]
+    ET.SubElement(dependency, "groupId").text = value["groupId"]
     ET.SubElement(dependency, "artifactId").text = model_name
     ET.SubElement(dependency, "version").text = value["version"]
 
 # Dumps the indented XML to stdout
 tree = ET.ElementTree(dependencies)
-ET.indent(tree, space="\t",level=0)
+ET.indent(tree, space="\t", level=0)
 ET.dump(tree)
