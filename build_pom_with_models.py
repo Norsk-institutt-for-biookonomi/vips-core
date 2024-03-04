@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
 '''
-Merges pom.xml and models.xml (default) into pom_with_models.xml and
-runs mvn clean install -f pom_with_models.xml
+Merges pom.xml and models.xml (default) into pom_with_models.xml
 
 Copyright (C) 2023 NIBIO
 
@@ -49,6 +48,6 @@ for dep in model_dep_elements:
     pom_deps_element.appendChild(dep)
 
 # Write the modified pom dom to file
-pom_with_models_file = open(merged_pom_filename,"w")
+pom_with_models_file = open(merged_pom_filename, "w")
 pom_dom.writexml(pom_with_models_file)
 pom_with_models_file.close()
