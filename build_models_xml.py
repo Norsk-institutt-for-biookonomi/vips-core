@@ -63,6 +63,9 @@ model_prefixes = ["no/nibio/vips/model", "fi/luke/vips/model"]
 
 # Returns -1 if number_a < number_b, 1 if number_a > number_b, 0 if equal
 def compare_version_numbers(number_a, number_b):
+    # Make sure we remove "-SNAPSHOT"
+    number_a = number_a.split("-")[0]
+    number_b = number_b.split("-")[0]
     number_a_parts = list(map(int,number_a.split(".")))
     number_b_parts = list(map(int,number_b.split(".")))
     for idx in range(len(number_a_parts)):
