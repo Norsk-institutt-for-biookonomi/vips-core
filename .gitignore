@@ -9,3 +9,4 @@ jboss/
 .vscode/settings.json
 .settings/org.eclipse.core.resources.prefs
 pom_with_models.xml
+my_models.xml
