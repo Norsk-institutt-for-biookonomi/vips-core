@@ -2,7 +2,7 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>RoughageNutritionModel</artifactId>
-		<version>1.1.9</version>
+		<version>1.1.10</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
@@ -37,11 +37,6 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>BremiaLactucaeModel</artifactId>
-		<version>1.1.7</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>DeliaRadicumModel</artifactId>
 		<version>1.1.7</version>
 	</dependency>
 	<dependency>
@@ -101,6 +96,11 @@
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>DeliaRadicumModel</artifactId>
+		<version>1.1.7</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>SeptoriaReferenceHumidityModel</artifactId>
 		<version>1.1.6</version>
 	</dependency>
@@ -108,5 +108,10 @@
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>SeptoriaApiicolaModel</artifactId>
 		<version>1.1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>DayDegreesModel</artifactId>
+		<version>0.1.1</version>
 	</dependency>
 </dependencies>
