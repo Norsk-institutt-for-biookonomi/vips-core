@@ -18,6 +18,7 @@
 
 package no.nibio.vips.core.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -115,7 +116,7 @@ public class ModelResourceImpl implements ModelResource{
                 { 
                     retVal.append(mF.getModelInstance(key).getModelName(language));
                 }
-                catch(DuplicateModelIdException ex)
+                catch(DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
                 {
                     retVal.append(ex.getMessage());
                 }
@@ -149,7 +150,7 @@ public class ModelResourceImpl implements ModelResource{
         {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
-            } catch (InstantiationException | IllegalAccessException | NoSuchModelException | DuplicateModelIdException ex) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex) {
                 retVal.append(key).append(" ").append(ex.getMessage()).append("\n");
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -231,7 +232,7 @@ public class ModelResourceImpl implements ModelResource{
             {
                  sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
             }
-            catch(NoSuchModelException | DuplicateModelIdException ex)
+            catch(NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
             {
                 sampleConfig = ex.getMessage();
             }
@@ -261,7 +262,7 @@ public class ModelResourceImpl implements ModelResource{
             }
             else throw new ModelExcecutionException("Model returned NULL Result");
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().entity(ex.getMessage()).build();
