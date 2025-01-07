@@ -18,9 +18,6 @@
 
 package no.nibio.vips.model.factory;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ScanResult;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import no.nibio.vips.model.Model;
 
 /**
@@ -96,34 +96,6 @@ public class ModelFactory {
      * Builds an inventory. 
      */
     private void init(){
-        /* 
-         * Reflections API insists on using at least one package prefix. So we scan
-         * through all TLDs. List is compiled from 
-         * http://en.wikipedia.org/wiki/List_of_Internet_top-level_domains
-         */ 
-        String[] defaultTopDomains = {
-            "aero","asia","biz","cat","com","coop","info","int","jobs","mobi",
-            "museum","name","net","org","post","pro","tel","travel","edu","gov",
-            "ac","ad","ae","af","ag","ai","al","am","an","ao","aq","ar","as","at",
-            "au","aw","ax","az","ba","bb","bd","be","bf","bg","bh","bi","bj","bm",
-            "bn","bo","br","bs","bt","bv","bw","by","bz","ca","cc","cd","cf","cg",
-            "ch","ci","ck","cl","cm","cn","co","cr","cs","cu","cv","cx","cy","cz",
-            "dd","de","dj","dk","dm","do","dz","ec","ee","eg","eh","er","es","et",
-            "eu","fi","fj","fk","fm","fo","fr","ga","gb","gd","ge","gf","gg","gh",
-            "gi","gl","gm","gn","gp","gq","gr","gs","gt","gu","gw","gy","hk","hm",
-            "hn","hr","ht","hu","id","ie","il","im","in","io","iq","ir","is","it",
-            "je","jm","jo","jp","ke","kg","kh","ki","km","kn","kp","kr","kw","ky",
-            "kz","la","lb","lc","li","lk","lr","ls","lt","lu","lv","ly","ma","mc",
-            "md","me","mg","mh","mk","ml","mm","mn","mo","mp","mq","mr","ms","mt",
-            "mu","mv","mw","mx","my","mz","na","nc","ne","nf","ng","ni","nl","no",
-            "np","nr","nu","nz","om","pa","pe","pf","pg","ph","pk","pl","pm","pn",
-            "pr","ps","pt","pw","py","qa","re","ro","rs","ru","rw","sa","sb","sc",
-            "sd","se","sg","sh","si","sj","sk","sl","sm","sn","so","sr","ss","st",
-            "su","sv","sx","sy","sz","tc","td","tf","tg","th","tj","tk","tl","tm",
-            "tn","to","tp","tr","tt","tv","tw","tz","ua","ug","uk","us","uy","uz",
-            "va","vc","ve","vg","vi","vn","vu","wf","ws","ye","yt","yu","za","zm",
-            "zw",
-        };
         
         /**
          * Warning: This generates a WARNING from a filesystem/JARfile scan error
@@ -131,19 +103,14 @@ public class ModelFactory {
          * this in log files. 
          */
 
-        Set<Class<? extends Model>> subTypes = new HashSet();
+        Set<Class<? extends Model>> subTypes = new HashSet<>();
         
-        /*for(String topDomain: defaultTopDomains)
-        {
-            reflections = new Reflections(topDomain);
-            subTypes.addAll(reflections.getSubTypesOf(Model.class));   
-        }*/
         boolean verboseClassGraph = System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH") != null && System.getProperty("no.nibio.vips.core.VERBOSE_CLASSGRAPH").equals("true");
-        try (ScanResult scanResult =                // Assign scanResult in try-with-resources
+        try (ScanResult scanResult =        // Assign scanResult in try-with-resources
         new ClassGraph()                    // Create a new ClassGraph instance
-            .verbose(verboseClassGraph)                      // If you want to enable logging to stderr
-            .enableClassInfo()            // Scan classes, methods, fields, annotations
-            //.acceptPackages("com.xyz")      // Scan com.xyz and subpackages
+            .verbose(verboseClassGraph)     // If you want to enable logging to stderr
+            .enableClassInfo()              // Scan classes, methods, fields, annotations
+            //.acceptPackages("no.nibio")   // Scan no.nibio and subpackages
             .scan()) {                      // Perform the scan and return a ScanResult
             
             //ClassInfoList classInfoList = 
@@ -156,7 +123,7 @@ public class ModelFactory {
         /**
          * Iterates and instantiates one object for each class
          */
-        this.models = new HashMap();
+        this.models = new HashMap<>();
         for(Class<? extends Model> subType : subTypes)
         {
                try {
@@ -303,7 +270,10 @@ public class ModelFactory {
                 InstantiationException, 
                 IllegalAccessException, 
                 DuplicateModelIdException, 
-                NoSuchModelException
+                NoSuchModelException,
+                SecurityException,
+                NoSuchMethodException,
+                InvocationTargetException
     {
         if(this.isDuplicateModelId(modelId))
         {
@@ -313,7 +283,7 @@ public class ModelFactory {
         {
             throw new NoSuchModelException("ERROR: No model found with id = " + modelId);
         }
-        return this.models.get(modelId).getClass().newInstance();
+        return this.models.get(modelId).getClass().getDeclaredConstructor().newInstance();
     }
 
     private void addDuplicateModelId(String modelId) {
