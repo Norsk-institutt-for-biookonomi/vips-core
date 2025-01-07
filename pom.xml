@@ -9,7 +9,7 @@
     <groupId>no.nibio</groupId>
     <artifactId>VIPSCore</artifactId>
     <packaging>war</packaging>
-     <version>2.0.15-SNAPSHOT</version>
+     <version>3.0.0-SNAPSHOT</version>
 
     <name>VIPSCore</name>
     <url>http://maven.apache.org</url>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>no.nibio.vips</groupId>
             <artifactId>VIPSCommon</artifactId>
-            <version>2.1.1</version>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -92,16 +92,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.2</version>
-            <scope>provided</scope>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -110,9 +104,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>8.0.1</version>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>10.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -145,8 +139,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             <plugin>
