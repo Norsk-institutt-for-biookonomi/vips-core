@@ -9,7 +9,7 @@
     <groupId>no.nibio</groupId>
     <artifactId>VIPSCore</artifactId>
     <packaging>war</packaging>
-     <version>3.0.1-SNAPSHOT</version>
+     <version>3.0.1</version>
 
     <name>VIPSCore</name>
     <url>http://maven.apache.org</url>
