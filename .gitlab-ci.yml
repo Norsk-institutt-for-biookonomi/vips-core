@@ -111,7 +111,7 @@ deploy-to-staging:
   stage: deploy
   script:
     # Authentication setup
-    - mkdir -p ~/.ssh
+    - mkdir -p ~/.ssh 
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
