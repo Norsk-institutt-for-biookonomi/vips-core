@@ -59,29 +59,53 @@ if response.status_code == 200:
 
 models = {}
 
-model_prefixes = ["no/nibio/vips/model","fi/luke/vips/model"]
+model_prefixes = ["no/nibio/vips/model", "fi/luke/vips/model"]
+
+# Returns -1 if number_a < number_b, 1 if number_a > number_b, 0 if equal
+def compare_version_numbers(number_a, number_b):
+    # Make sure we remove "-SNAPSHOT"
+    number_a = number_a.split("-")[0]
+    number_b = number_b.split("-")[0]
+    number_a_parts = list(map(int,number_a.split(".")))
+    number_b_parts = list(map(int,number_b.split(".")))
+    for idx in range(len(number_a_parts)):
+        if idx > len(number_b_parts) -1:
+            # Versions are equal so far, but number_b is out of parts. Thus: number_a must be a greater version
+            return 1
+        if number_a_parts[idx] < number_b_parts[idx]:
+            return -1
+        elif number_a_parts[idx] > number_b_parts[idx]:
+            return 1
+    # No differences found in the parts that number_a and number_b have in common.
+    # If number_a and number_b have same number of parts, they must be equal
+    # If number_b still has parts left, it must be greater
+    return -1 if len(number_b_parts) > len(number_a_parts) else 0
+
 
 # Filter models and store only the most recent version (highest alphanumeric number)
 for package in all_packages:
     for model_prefix in model_prefixes:
-        if package["name"].find(model_prefix) >=0 and ((snapshot and package["version"].find("SNAPSHOT")>=0) or (not snapshot and package["version"].find("SNAPSHOT")<0)):
+        if package["name"].find(model_prefix) >= 0 and ((snapshot and package["version"].find("SNAPSHOT") >= 0) or (not snapshot and package["version"].find("SNAPSHOT") < 0)):
             model_name = package["name"][len(model_prefix) + 1:]
-            if models.get(model_name, None) == None:
+            if models.get(model_name, None) is None:
                 models[model_name] = {}
-                models[model_name]["groupId"] = model_prefix.replace("/",".")
+                models[model_name]["groupId"] = model_prefix.replace("/", ".")
                 models[model_name]["version"] = package["version"]
             else:
-                models[model_name]["version"] = package["version"] if package["version"] > models[model_name]["version"] else models[model_name]["version"]
+                # Compare models so that 1.1.10 > 1.1.9
+                models[model_name]["version"] = package["version"] if compare_version_numbers(package["version"], models[model_name]["version"]) > 0 else models[model_name]["version"]
+                #models[model_name]["version"] = package["version"] if package["version"] > models[model_name]["version"] else models[model_name]["version"]
+                #print("%s %s" % (model_name, package["version"]))
 
 # Build partial Maven XML
 dependencies = ET.Element("dependencies")
 for model_name, value in models.items():
     dependency = ET.SubElement(dependencies, "dependency")
-    ET.SubElement(dependency,"groupId").text = value["groupId"]
+    ET.SubElement(dependency, "groupId").text = value["groupId"]
     ET.SubElement(dependency, "artifactId").text = model_name
     ET.SubElement(dependency, "version").text = value["version"]
 
 # Dumps the indented XML to stdout
 tree = ET.ElementTree(dependencies)
-ET.indent(tree, space="\t",level=0)
+ET.indent(tree, space="\t", level=0)
 ET.dump(tree)
