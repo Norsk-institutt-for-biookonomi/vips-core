@@ -18,8 +18,7 @@
 
 package no.nibio.vips.core.startup;
 
-import javax.servlet.ServletContextEvent;
-
+import jakarta.servlet.ServletContextEvent;
 import no.nibio.vips.model.factory.ModelFactory;
 /**
  * This class is created and method contextInitialized called when the application
@@ -28,7 +27,7 @@ import no.nibio.vips.model.factory.ModelFactory;
  * @copyright 2013 {@link http://www.nibio.no NIBIO}
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-public class StartupListener implements javax.servlet.ServletContextListener{
+public class StartupListener implements jakarta.servlet.ServletContextListener{
 
     /**
      * Called when the application

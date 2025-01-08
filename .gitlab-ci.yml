@@ -15,7 +15,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
   MAIN_BRANCH: "main"
   RELEASE_BRANCH: "release"
-  CLI_PATH: "/disks/data01/wildfly/wildfly-26.1.3.Final/bin"
+  CLI_PATH: "/disks/data01/wildfly/wildfly-34.0.1.Final/bin"
   TMP_PATH: "/home/deployer/gitlab_tmp"
   DEPLOYMENT_PATH: "/home/wildfly/deployments"
   ARCHIVE_PATH: "/home/wildfly/archive"
@@ -111,7 +111,7 @@ deploy-to-staging:
   stage: deploy
   script:
     # Authentication setup
-    - mkdir -p ~/.ssh
+    - mkdir -p ~/.ssh 
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
     - chmod 600 ~/.ssh/id_dsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config

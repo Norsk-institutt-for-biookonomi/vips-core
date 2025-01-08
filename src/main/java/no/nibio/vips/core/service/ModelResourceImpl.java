@@ -18,19 +18,20 @@
 
 package no.nibio.vips.core.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import no.nibio.vips.entity.ModelConfiguration;
 import no.nibio.vips.entity.Result;
 import no.nibio.vips.ipmdecisions.DataTransformer;
@@ -115,7 +116,7 @@ public class ModelResourceImpl implements ModelResource{
                 { 
                     retVal.append(mF.getModelInstance(key).getModelName(language));
                 }
-                catch(DuplicateModelIdException ex)
+                catch(DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
                 {
                     retVal.append(ex.getMessage());
                 }
@@ -149,7 +150,7 @@ public class ModelResourceImpl implements ModelResource{
         {
             try {
                 retVal.append(key).append(" ").append(mF.getModelInstance(key).getModelName(language)).append("\n");
-            } catch (InstantiationException | IllegalAccessException | NoSuchModelException | DuplicateModelIdException ex) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex) {
                 retVal.append(key).append(" ").append(ex.getMessage()).append("\n");
                 Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -231,7 +232,7 @@ public class ModelResourceImpl implements ModelResource{
             {
                  sampleConfig = ModelFactory.getInstance().getModelInstance(modelId).getSampleConfig();
             }
-            catch(NoSuchModelException | DuplicateModelIdException ex)
+            catch(NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
             {
                 sampleConfig = ex.getMessage();
             }
@@ -261,7 +262,7 @@ public class ModelResourceImpl implements ModelResource{
             }
             else throw new ModelExcecutionException("Model returned NULL Result");
         }
-        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException ex)
+        catch(InstantiationException | IllegalAccessException | ConfigValidationException | ModelExcecutionException | NoSuchModelException | DuplicateModelIdException | SecurityException | NoSuchMethodException | InvocationTargetException ex)
         {
             Logger.getLogger(ModelResourceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return Response.serverError().entity(ex.getMessage()).build();

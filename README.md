@@ -34,7 +34,7 @@ $ mvnw.cmd clean install
 
 **PLEASE NOTE that this builds the package without any models. See "Adding models" below for more information**
 
-Download and install [WildFly](https://www.wildfly.org/) == 26.1.3
+Download and install [WildFly](https://www.wildfly.org/) == 34.0.1
 
 Deploy the build from this project in Wildfly.
 
