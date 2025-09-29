@@ -8,7 +8,7 @@ WORKDIR /app
 COPY mvnw mvnw.cmd ./
 COPY .mvn ./.mvn
 COPY pom.xml ./
-COPY models.xml ./
+COPY models_for_docker.xml ./
 COPY build_with_models.py ./
 
 # Make mvnw executable
@@ -19,8 +19,7 @@ COPY src ./src
 
 # Install Python3 and build the application with models
 RUN apt-get update && apt-get install -y python3 && \
-    ./mvnw clean install -f pom.xml && \
-    python3 build_with_models.py models.xml
+    python3 build_with_models.py models_for_docker.xml
 
 # Runtime stage
 FROM quay.io/wildfly/wildfly:34.0.1.Final-jdk17
