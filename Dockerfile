@@ -1,5 +1,5 @@
 # Multi-stage build for VIPSCore
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
+FROM maven:3.9.12-eclipse-temurin-17 AS builder
 
 # Set working directory
 WORKDIR /app
