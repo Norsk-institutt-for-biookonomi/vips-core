@@ -6,7 +6,7 @@ stages:
   - upload
 
 variables:
-  COMMON_CONFIG_REMOTE: https://root:$CONFIG_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
+  COMMON_CONFIG_REMOTE: https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
   COMMON_CONFIG_LOCAL: "vips-common-config"
   SETTINGS_XML: "ci_settings.xml"
   MAVEN_POM: "-f pom.xml"
@@ -29,7 +29,7 @@ before_script:
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - echo "Get common settings"
-  - git clone $COMMON_CONFIG_REMOTE $COMMON_CONFIG_LOCAL
+  - git clone --depth=1 "$COMMON_CONFIG_REMOTE" "$COMMON_CONFIG_LOCAL"
   - cp $COMMON_CONFIG_LOCAL/$SETTINGS_XML .
   - rm -rf $COMMON_CONFIG_LOCAL
   - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
@@ -50,10 +50,10 @@ build-for-staging:
 build-for-production:
   stage: build
   script:
-    # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
+    # Use access token given by CI/CD variable CICD_ACCESS_TOKEN to authenticate
     # This is necessary in order to push changes to git
     - &authenticate
-      - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+      - export NEW_REPO_URL=https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
       - git remote set-url --push origin $NEW_REPO_URL
       - git fetch origin --prune --prune-tags
 
@@ -203,9 +203,9 @@ deploy-to-production:
 upload-and-tag-release:
   stage: upload
   script:
-    # Use access token given by CI/CD variable ACCESS_TOKEN to authenticate
+    # Use access token given by CI/CD variable CICD_ACCESS_TOKEN to authenticate
     # This is necessary in order to push changes to git
-    - export NEW_REPO_URL=https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    - export NEW_REPO_URL=https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
     - git remote set-url --push origin $NEW_REPO_URL
     - git fetch origin --prune --prune-tags
 
