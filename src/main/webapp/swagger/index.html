@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VIPSCore API Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+      html, body { margin: 0; padding: 0; }
+      #swagger-ui { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="custom-info" class="swagger-ui">
+    <div class="information-container wrapper">
+      <div class="wrapper">
+        <section class="block col-12 block-desktop col-12-desktop">
+          <h1>
+            VIPSCore API Documentation
+          </h1>
+          <p>VIPSCore is the server component that hosts the models. It is accessible via VIPSCoreManager over http/REST. Models that are on the component's classpath
+            are autodetected, indexed and made available through the REST service. The service is used by VIPSLogic when running models. It can also be contacted 
+            directly by any client.
+          </p>
+          <p>
+            VIPSCore is a part of <a href="https://nibio.no/en/" target="_blank">NIBIO</a>'s <a href="https://gitlab.nibio.no/VIPS/documentation" target="_blank">VIPS platform for automatic pest prediction</a>
+          </p>
+          <p>
+            VIPSCore is <a href="https://www.gnu.org/licenses/agpl-3.0.html">open source software</a> released under the GNU Affero General Public License (AGPL) version 3 or later.
+            You can download the source code from <a href="https://gitlab.nibio.no/VIPS/VIPSCore" target="_blank">NIBIO's GitLab</a>.
+          </p>
+          <p>
+            To use the service running on NIBIO's infrastructure, you need an agreement. Also, credit must be given to NIBIO when using the service. (Terms will be available soon).
+          </p>
+        </section>
+      </div>
+    </div>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.ui = SwaggerUIBundle({
+        url: '../openapi',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: 'BaseLayout'
+      });
+    </script>
+  </body>
+  </html>

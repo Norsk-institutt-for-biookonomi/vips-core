@@ -22,6 +22,8 @@ package no.nibio.vips.core;
 import java.util.Set;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 
 
 /**
@@ -48,6 +50,10 @@ public class VIPSCoreApplication extends Application
     private void addRestResourceClassesManually(Set<Class<?>> resources) {
         resources.add(no.nibio.vips.core.config.JacksonConfig.class);
         resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
+        resources.add(no.nibio.vips.core.web.SwaggerUiResource.class);
+        // OpenAPI endpoints: /openapi (JSON/YAML)
+        resources.add(OpenApiResource.class);
+        resources.add(AcceptHeaderOpenApiResource.class);
     }
 
     private void addRestResourceClasses(Set<Class<?>> resources) {

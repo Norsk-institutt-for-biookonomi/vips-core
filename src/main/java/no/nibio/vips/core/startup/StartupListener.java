@@ -20,6 +20,10 @@ package no.nibio.vips.core.startup;
 
 import jakarta.servlet.ServletContextEvent;
 import no.nibio.vips.model.factory.ModelFactory;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import java.util.Set;
 /**
  * This class is created and method contextInitialized called when the application
  * is deployed (either at startup of application container or when redeploying the app)
@@ -40,6 +44,23 @@ public class StartupListener implements jakarta.servlet.ServletContextListener{
         // We create the singleton instance of ModelFactory at startup, as this
         // takes a few seconds (due to scanning of file system)
         ModelFactory singletonFactory = ModelFactory.getInstance();
+
+        // Configure OpenAPI to only scan VIPSCore packages to avoid leaking endpoints
+        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+            .resourcePackages(Set.of("no.nibio.vips.core"))
+            .resourceClasses(Set.of(
+                no.nibio.vips.core.service.ModelResourceImpl.class.getName(),
+                no.nibio.vips.core.web.SwaggerUiResource.class.getName()
+            ))
+            .prettyPrint(true);
+            
+        try {
+            new JaxrsOpenApiContextBuilder()
+                .openApiConfiguration(oasConfig)
+                .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            e.printStackTrace();    
+        }
     }
 
     /**
