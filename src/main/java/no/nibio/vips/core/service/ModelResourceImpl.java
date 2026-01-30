@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -48,6 +49,7 @@ import no.nibio.vips.model.factory.NoSuchModelException;
  * @copyright 2020 {@link http://www.nibio.no NIBIO}
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
+@Tag(name = "Models", description = "VIPS models and utility endpoints")
 public class ModelResourceImpl implements ModelResource{
     
     @Context

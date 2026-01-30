@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VIPSCore API Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+      html, body { margin: 0; padding: 0; }
+      #swagger-ui { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="custom-info" style="background:#0b5;color:#fff;padding:12px 16px;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+      <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-weight:600;font-size:16px;">VIPSCore API Documentation</span>
+        <span style="opacity:.9">Custom notice: add your environment, links, or usage tips here.</span>
+      </div>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.ui = SwaggerUIBundle({
+        url: '../openapi',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: 'BaseLayout'
+      });
+    </script>
+  </body>
+  </html>
