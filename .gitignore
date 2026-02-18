@@ -10,3 +10,4 @@ jboss/
 .settings/org.eclipse.core.resources.prefs
 pom_with_models.xml
 my_models.xml
+nbproject/project.properties
