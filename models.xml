@@ -31,11 +31,6 @@
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>AppleScabModel</artifactId>
-		<version>1.1.17</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>DeliaRadicumModel</artifactId>
 		<version>1.1.16</version>
 	</dependency>
@@ -72,7 +67,7 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>MamestraBrassicaeModel</artifactId>
-		<version>1.1.15</version>
+		<version>1.1.16</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
