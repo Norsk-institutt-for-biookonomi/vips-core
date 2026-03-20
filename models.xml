@@ -112,7 +112,7 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>Model_MYCOSRIBIS</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.6</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
@@ -120,3 +120,4 @@
 		<version>0.1.6</version>
 	</dependency>
 </dependencies>
+	
