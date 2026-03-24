@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VIPSCore API Docs</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+    <style>
+      html, body { margin: 0; padding: 0; }
+      #swagger-ui { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="custom-info" class="swagger-ui">
+    <div class="information-container wrapper">
+      <div class="wrapper">
+        <section class="block col-12 block-desktop col-12-desktop">
+          <h1>
+            VIPSCore API Documentation
+          </h1>
+          <p>VIPSCore is the server component that hosts the models. It is accessible via VIPSCoreManager over http/REST. Models that are on the component's classpath
+            are autodetected, indexed and made available through the REST service. The service is used by VIPSLogic when running models. It can also be contacted 
+            directly by any client.
+          </p>
+          <p>
+            VIPSCore is a part of <a href="https://nibio.no/en/" target="_blank">NIBIO</a>'s <a href="https://gitlab.nibio.no/VIPS/documentation" target="_blank">VIPS platform for automatic pest prediction</a>
+          </p>
+          <p>
+            VIPSCore is <a href="https://www.gnu.org/licenses/agpl-3.0.html">open source software</a> released under the GNU Affero General Public License (AGPL) version 3 or later.
+            You can download the source code from <a href="https://gitlab.nibio.no/VIPS/VIPSCore" target="_blank">NIBIO's GitLab</a>.
+          </p>
+          <p>
+            To use the data and results from this service running on NIBIO's infrastructure, you need to comply with the following terms:
+          </p>
+          <div style="padding: 15px; background-color: #cccccc; border: 1px solid black;">
+            <p>
+              &copy; 2026 NIBIO
+            </p>
+            <p>This material is made available under the <a href="https://data.norge.no/nlod/en/2.0" target="_blank">Norwegian Licence for Open Government Data (NLOD).</a></p>
+            <p>The material may be freely shared and adapted, subject to the following conditions:</p>
+            <ul>
+            <li>The data shall not be used in a misleading manner, nor shall it be distorted or misrepresented.</li>
+            <li>Appropriate attribution of the licensor is required and must be provided in a way that does not suggest 
+              that the licensor endorses, approves of, or recommends your use of the dataset or any derived works. 
+              The attribution must be visible everywhere the data are displayed. The attribution should be as 
+              follows: <span style="font-style: italic; font-weight: bold;">Contains data under NLOD, made available through
+              <a href="https://www.vips-landbruk.no/" target="_blank">https://www.vips-landbruk.no/</a></span> or shorter, if mutually agreed upon.</li>
+            </ul>
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.ui = SwaggerUIBundle({
+        url: '../openapi',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [SwaggerUIBundle.presets.apis],
+        layout: 'BaseLayout'
+      });
+    </script>
+  </body>
+  </html>

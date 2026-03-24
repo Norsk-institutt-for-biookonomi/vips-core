@@ -20,8 +20,10 @@
 package no.nibio.vips.core;
 
 import java.util.Set;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.jaxrs2.integration.resources.AcceptHeaderOpenApiResource;
 
 
 /**
@@ -50,9 +52,13 @@ public class VIPSCoreApplication extends Application
         resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
         resources.add(no.nibio.vips.core.auth.AuthResource.class);
         resources.add(no.nibio.vips.core.auth.JwtAuthFilter.class);
+        resources.add(no.nibio.vips.core.web.SwaggerUiResource.class);
+        resources.add(OpenApiResource.class);
+        resources.add(AcceptHeaderOpenApiResource.class);
     }
 
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(no.nibio.vips.core.config.JacksonConfig.class);
+        resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
     }
 }

@@ -1,27 +1,29 @@
 /*
  * Copyright (c) 2014 NIBIO <http://www.nibio.no/>. 
- * 
- * This file is part of VIPSCore.
- * VIPSCore is free software: you can redistribute it and/or modify
- * it under the terms of the NIBIO Open Source License as published by 
- * NIBIO, either version 1 of the License, or (at your option) any
- * later version.
- * 
- * VIPSCore is distributed in the hope that it will be useful,
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * NIBIO Open Source License for more details.
- * 
- * You should have received a copy of the NIBIO Open Source License
- * along with VIPSCore.  If not, see <http://www.nibio.no/licenses/>.
- * 
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package no.nibio.vips.core.startup;
 
-import javax.servlet.ServletContextEvent;
-
+import jakarta.servlet.ServletContextEvent;
 import no.nibio.vips.model.factory.ModelFactory;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import java.util.Set;
 /**
  * This class is created and method contextInitialized called when the application
  * is deployed (either at startup of application container or when redeploying the app)
@@ -29,7 +31,7 @@ import no.nibio.vips.model.factory.ModelFactory;
  * @copyright 2013 {@link http://www.nibio.no NIBIO}
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-public class StartupListener implements javax.servlet.ServletContextListener{
+public class StartupListener implements jakarta.servlet.ServletContextListener{
 
     /**
      * Called when the application
@@ -42,6 +44,23 @@ public class StartupListener implements javax.servlet.ServletContextListener{
         // We create the singleton instance of ModelFactory at startup, as this
         // takes a few seconds (due to scanning of file system)
         ModelFactory singletonFactory = ModelFactory.getInstance();
+
+        // Configure OpenAPI to only scan VIPSCore packages to avoid leaking endpoints
+        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+            .resourcePackages(Set.of("no.nibio.vips.core"))
+            .resourceClasses(Set.of(
+                no.nibio.vips.core.service.ModelResourceImpl.class.getName(),
+                no.nibio.vips.core.web.SwaggerUiResource.class.getName()
+            ))
+            .prettyPrint(true);
+            
+        try {
+            new JaxrsOpenApiContextBuilder()
+                .openApiConfiguration(oasConfig)
+                .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            e.printStackTrace();    
+        }
     }
 
     /**

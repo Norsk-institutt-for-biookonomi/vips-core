@@ -1,0 +1,247 @@
+image: eclipse-temurin:17.0.9_9-jdk-jammy
+stages:
+  - build
+  - test
+  - deploy
+  - upload
+
+variables:
+  COMMON_CONFIG_REMOTE: https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/VIPS/vips-common-config.git
+  COMMON_CONFIG_LOCAL: "vips-common-config"
+  SETTINGS_XML: "ci_settings.xml"
+  MAVEN_POM: "-f pom.xml"
+  MAVEN_POM_WITH_MODELS: "-f pom_with_models.xml"
+  MAVEN_CLI_OPTS: "-s $SETTINGS_XML --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.artifact.threads=10"
+  MAIN_BRANCH: "main"
+  RELEASE_BRANCH: "release"
+  CLI_PATH: "/disks/data01/wildfly/wildfly-34.0.1.Final/bin"
+  TMP_PATH: "/home/deployer/gitlab_tmp"
+  DEPLOYMENT_PATH: "/home/wildfly/deployments"
+  ARCHIVE_PATH: "/home/wildfly/archive"
+
+cache:
+  paths:
+    - .m2/repository/
+
+before_script:
+  - apt-get update && apt-get install -y git
+  - git config --global user.name "${GITLAB_USER_NAME}"
+  - git config --global user.email "${GITLAB_USER_EMAIL}"
+  - echo "Get common settings"
+  - git clone --depth=1 "$COMMON_CONFIG_REMOTE" "$COMMON_CONFIG_LOCAL"
+  - cp $COMMON_CONFIG_LOCAL/$SETTINGS_XML .
+  - rm -rf $COMMON_CONFIG_LOCAL
+  - apt-get update -y && apt-get install -y python3 && apt-get install -y rsync openssh-client
+  - "python3 build_pom_with_models.py"
+
+build-for-staging:
+  stage: build
+  script:
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
+  tags:
+    - java
+  artifacts:
+    paths:
+      - target/*.war
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"'
+
+build-for-production:
+  stage: build
+  script:
+    # Use access token given by CI/CD variable CICD_ACCESS_TOKEN to authenticate
+    # This is necessary in order to push changes to git
+    - &authenticate
+      - export NEW_REPO_URL=https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+      - git remote set-url --push origin $NEW_REPO_URL
+      - git fetch origin --prune --prune-tags
+
+    # Checkout release branch
+    - &checkout_release
+      - git stash -a
+      - git checkout $RELEASE_BRANCH
+      - git reset --hard origin/$RELEASE_BRANCH
+      - git stash pop
+
+    # Set release version. Commit and push if tag for release version does not already exist.
+    - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DremoveSnapshot"
+    - "python3 build_pom_with_models.py"
+    - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - echo "New version in release '$RELEASE_VERSION'"
+    # If tag for new release version already exist, exit with error
+    - export RELEASE_TAG="v${RELEASE_VERSION}"
+    - echo "Release tag '$RELEASE_TAG'"
+    - export EXISTING_TAGS=$(git ls-remote --tags origin | cut -f 2 | grep "refs/tags/$RELEASE_TAG$")
+    - echo "Existing tags '$EXISTING_TAGS'"
+    - if [ -n "$EXISTING_TAGS" ]; then
+      echo "Tag $RELEASE_TAG already exists"; exit 1;
+      fi
+    # If release tag does not already exist, commit and push pom with new version
+    - git add pom.xml
+    - |
+      if git diff --cached --quiet -- pom.xml; then
+          echo "No changes to commit for pom.xml, skipping commit and push"
+      else
+          git commit -m "[ci skip] Set release version ${RELEASE_VERSION}"
+          git push origin $RELEASE_BRANCH
+      fi
+    # Build new war file
+    - echo "Build war file with version '$RELEASE_VERSION'"
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS package -DskipTests"
+  tags:
+    - java
+  artifacts:
+    paths:
+      - target/*.war
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
+
+test:
+  stage: test
+  script:
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS test"
+  tags:
+    - java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"'
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
+
+deploy-to-staging:
+  stage: deploy
+  script:
+    # Authentication setup
+    - mkdir -p ~/.ssh 
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
+    - chmod 600 ~/.ssh/id_dsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    # Find name of war file in target folder (built previously in build stage), exit if none exists
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1 | xargs basename)
+    - if [ -z "$WAR_FILE" ]; then echo "No war file found in target directory"; exit 1; fi
+    # Create temporary directory on server, copy war file and deployment script there
+    - echo "Create temporary directory on the server"
+    - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
+    - scp target/$WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
+    - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
+    # Find name of currently deployed application. Undeploy.
+    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | tr ' ' '\n'  | grep VIPSCore-.*war")
+    - echo $CURRENTLY_DEPLOYED
+    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"
+    # Deploy war file using JBoss CLI and credentials given in CI/CD variables
+    - echo "Deploy $WAR_FILE using JBoss CLI"
+    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli" > deployment.log 2>&1
+    # Restart should not be necessary
+    - echo "Restart WildFly"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
+    # Delete temporary directory on server
+    - echo "Delete temporary directory"
+    - ssh $SERVER_USER@$SERVER_IP "rm -rf $TMP_PATH"
+  after_script:
+    - echo "Deployment complete"
+  tags:
+    - java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"'
+  environment:
+    name: staging
+    url: https://vipscore02test.nibio.no
+
+upload-snapshot:
+  stage: upload
+  script:
+    - export VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - if ! [[ $VERSION =~ .*SNAPSHOT ]]; then
+      echo "Version '$VERSION' is not SNAPSHOT"; exit 1;
+      fi
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
+  tags:
+    - java
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $MAIN_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"'
+
+deploy-to-production:
+  stage: deploy
+  script:
+    # Authentication setup, for running commands on server
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_dsa
+    - chmod 600 ~/.ssh/id_dsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    # Find name of war file in target folder (built previously in build stage), exit if none exists
+    - WAR_FILE=$(find target -maxdepth 1 -type f -name "*.war" | sort -n | tail -1 | xargs basename)
+    - if [ -z "$WAR_FILE" ]; then echo "No war file found in target directory"; exit 1; fi
+    # Create temporary directory on server, copy war file and deployment script there
+    - echo "Create temporary directory on the server"
+    - ssh $SERVER_USER@$SERVER_IP "mkdir -p $TMP_PATH"
+    - scp target/$WAR_FILE $SERVER_USER@$SERVER_IP:$TMP_PATH
+    - echo "deploy $TMP_PATH/$WAR_FILE --force" > deploy.cli
+    - scp deploy.cli $SERVER_USER@$SERVER_IP:$TMP_PATH
+    # Find name of currently deployed application. Undeploy.
+    - CURRENTLY_DEPLOYED=$(ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --commands=ls\ deployment | tr ' ' '\n'  | grep VIPSCore-.*war")
+    - echo $CURRENTLY_DEPLOYED
+    - if [ -n "$CURRENTLY_DEPLOYED" ]; then ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --command='undeploy $CURRENTLY_DEPLOYED'"; fi
+    # Deploy war file using JBoss CLI and credentials given in CI/CD variables
+    - echo "Deploy $WAR_FILE using JBoss CLI"
+    - ssh $SERVER_USER@$SERVER_IP "$CLI_PATH/jboss-cli.sh --user=$WILDFLY_ADMIN_USERNAME --password=$WILDFLY_ADMIN_PASSWORD --connect --file=$TMP_PATH/deploy.cli" > deployment.log 2>&1
+    # Restart should not be necessary
+    - echo "Restart WildFly"
+    - ssh $SERVER_USER@$SERVER_IP "sudo systemctl restart wildfly"
+    # Delete temporary directory on server
+    - echo "Delete temporary directory"
+    - ssh $SERVER_USER@$SERVER_IP "rm -rf $TMP_PATH"
+  after_script:
+    - echo "Deployment complete"
+  tags:
+    - java
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
+  environment:
+    name: production
+    url: https://vipscore02.nibio.no
+
+upload-and-tag-release:
+  stage: upload
+  script:
+    # Use access token given by CI/CD variable CICD_ACCESS_TOKEN to authenticate
+    # This is necessary in order to push changes to git
+    - export NEW_REPO_URL=https://oauth2:$CICD_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    - git remote set-url --push origin $NEW_REPO_URL
+    - git fetch origin --prune --prune-tags
+
+    # Checkout release branch
+    - git stash -a
+    - git checkout $RELEASE_BRANCH
+    - git reset --hard origin/$RELEASE_BRANCH
+    - git stash pop
+
+    # Set release version and deploy. Commit, tag and push.
+    - "python3 build_pom_with_models.py"
+    - export RELEASE_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - export RELEASE_TAG="v${RELEASE_VERSION}"
+    - echo "Version to deploy '$RELEASE_VERSION', will be tagged '$RELEASE_TAG'"
+    - "./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS deploy -DskipTests"
+    # NB! Wanted to use deploy:deploy-file with already built war file above, but this requires url to be specifically set
+    - git tag -a $RELEASE_TAG -m "Tag release ${RELEASE_TAG}"
+    - git push origin $RELEASE_TAG
+
+    # Checkout main branch
+    - git stash -a
+    - git checkout $MAIN_BRANCH
+    - git reset --hard origin/$MAIN_BRANCH
+    - git stash pop
+
+    # Merge release branch, bump patch version, push commits.
+    - git merge -m "[ci skip] Merge branch '${RELEASE_BRANCH}' into ${MAIN_BRANCH}" --no-ff $RELEASE_BRANCH
+    # Change version in pom.xml - build new pom_with_models.xml
+    - "./mvnw $MAVEN_CLI_OPTS $MAVEN_OPTS validate -DbumpPatch"
+    - "python3 build_pom_with_models.py"
+    - export SNAPSHOT_VERSION=$(./mvnw $MAVEN_POM_WITH_MODELS $MAVEN_CLI_OPTS $MAVEN_OPTS --batch-mode --no-transfer-progress --non-recursive help:evaluate -Dexpression=project.version | grep -v "\[.*")
+    - echo "New version in main '$SNAPSHOT_VERSION'"
+    - git add pom.xml
+    - git commit -m "[ci skip] Set snapshot version ${SNAPSHOT_VERSION}"
+    - git push origin $MAIN_BRANCH
+  tags:
+    - java
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $RELEASE_BRANCH
