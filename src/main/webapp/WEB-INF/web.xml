@@ -31,7 +31,7 @@
         <init-param>
             <!-- fix for http://code.google.com/p/chromium/issues/detail?id=108394 -->
             <param-name>cors.supportedHeaders</param-name>
-            <param-value>Origin, Content-type, Accept</param-value>
+            <param-value>Origin, Content-type, Accept, Authorization</param-value>
         </init-param>
     </filter>
     <filter-mapping>
