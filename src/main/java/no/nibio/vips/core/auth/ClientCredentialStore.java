@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.yaml.snakeyaml.Yaml;
@@ -13,22 +14,15 @@ public class ClientCredentialStore {
 
     private static final Logger LOGGER = Logger.getLogger(ClientCredentialStore.class.getName());
 
-    private static ClientCredentialStore instance;
-
-    private final Map<String, String> clientSecrets = new HashMap<>();
-
     private ClientCredentialStore() {}
 
-    public static synchronized ClientCredentialStore getInstance() {
-        if (instance == null) {
-            instance = new ClientCredentialStore();
-            instance.load();
-        }
-        return instance;
-    }
-
+    /**
+     * Reads clients.yml from disk and returns a map of clientId to secretHash.
+     * Called on every auth request so new clients are picked up without a restart.
+     */
     @SuppressWarnings("unchecked")
-    private void load() {
+    private static Map<String, String> loadClients() {
+        Map<String, String> clientSecrets = new HashMap<>();
         Yaml yaml = new Yaml();
         try (InputStream is = AuthConfig.openConfigFile("clients.yml")) {
             Map<String, Object> root = yaml.load(is);
@@ -42,26 +36,19 @@ public class ClientCredentialStore {
                     }
                 }
             }
-            LOGGER.info("Loaded " + clientSecrets.size() + " client credential(s).");
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to load clients.yml", e);
+            LOGGER.log(Level.SEVERE, "Failed to load clients.yml", e);
         }
+        return clientSecrets;
     }
 
-    public boolean validateCredentials(String clientId, String rawSecret) {
+    public static boolean validateCredentials(String clientId, String rawSecret) {
+        Map<String, String> clientSecrets = loadClients();
         String storedHash = clientSecrets.get(clientId);
         if (storedHash == null) {
             return false;
         }
         BCrypt.Result result = BCrypt.verifyer().verify(rawSecret.toCharArray(), storedHash);
         return result.verified;
-    }
-
-    /**
-     * Utility for generating BCrypt hashes when onboarding new clients.
-     * Run from a unit test or CLI: ClientCredentialStore.hashSecret("my-secret")
-     */
-    public static String  hashSecret(String rawSecret) {
-        return BCrypt.withDefaults().hashToString(12, rawSecret.toCharArray());
     }
 }
