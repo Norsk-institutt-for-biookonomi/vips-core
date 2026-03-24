@@ -24,7 +24,7 @@ public class AuthResource {
                     .build();
         }
 
-        if (!ClientCredentialStore.getInstance().validateCredentials(clientId, clientSecret)) {
+        if (!ClientCredentialStore.validateCredentials(clientId, clientSecret)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"error\":\"Invalid credentials\"}")
                     .build();
