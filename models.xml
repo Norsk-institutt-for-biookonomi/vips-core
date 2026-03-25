@@ -2,111 +2,122 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>RoughageNutritionModel</artifactId>
-		<version>1.1.20</version>
+		<version>1.1.21</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>AlternariaModel</artifactId>
-		<version>1.1.24</version>
+		<version>1.1.25</version>
 	</dependency>
 	<dependency>
 		<groupId>fi.luke.vips.model</groupId>
 		<artifactId>FinnCerealModels</artifactId>
-		<version>1.1.16</version>
+		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>Model_LEAFBLOTCH</artifactId>
-		<version>1.1.16</version>
+		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>NaerstadModel</artifactId>
-		<version>1.1.16</version>
+		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>SeptoriaHumidityModel</artifactId>
+		<version>1.1.18</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>AppleScabModel</artifactId>
 		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>DeliaRadicumModel</artifactId>
-		<version>1.1.16</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>DeliaRadicumFloralisObservationModel</artifactId>
-		<version>1.1.16</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>BremiaLactucaeModel</artifactId>
-		<version>1.1.19</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>DOWNCASTModel</artifactId>
-		<version>1.1.18</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>GrassDryingModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>LygusRugulipennisModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>Model_MAIZEPHENO</artifactId>
-		<version>1.1.14</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>MamestraBrassicaeModel</artifactId>
-		<version>1.1.16</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>OatFloweringModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>NegativePrognosisModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>PsilaRosaeObservationModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>PsilaRosaeTempModel</artifactId>
-		<version>1.1.15</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>BarleyNetBlotchModel</artifactId>
-		<version>1.1.18</version>
-	</dependency>
-	<dependency>
-		<groupId>no.nibio.vips.model</groupId>
-		<artifactId>SeptoriaApiicolaModel</artifactId>
 		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>DeliaRadicumFloralisObservationModel</artifactId>
+		<version>1.1.17</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>BremiaLactucaeModel</artifactId>
+		<version>1.1.20</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>DOWNCASTModel</artifactId>
+		<version>1.1.19</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>GrassDryingModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>LygusRugulipennisModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>Model_MAIZEPHENO</artifactId>
+		<version>1.1.15</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>MamestraBrassicaeModel</artifactId>
+		<version>1.1.17</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>OatFloweringModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>NegativePrognosisModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>PsilaRosaeObservationModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>PsilaRosaeTempModel</artifactId>
+		<version>1.1.16</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>BarleyNetBlotchModel</artifactId>
+		<version>1.1.19</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>SeptoriaApiicolaModel</artifactId>
+		<version>1.1.18</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>SeptoriaReferenceHumidityModel</artifactId>
-		<version>1.1.14</version>
+		<version>1.1.15</version>
+	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>Model_MYCOSRIBIS</artifactId>
+		<version>1.0.7</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>DayDegreesModel</artifactId>
-		<version>0.1.5</version>
+		<version>0.1.6</version>
 	</dependency>
 </dependencies>
+	

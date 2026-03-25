@@ -50,8 +50,9 @@ public class VIPSCoreApplication extends Application
     private void addRestResourceClassesManually(Set<Class<?>> resources) {
         resources.add(no.nibio.vips.core.config.JacksonConfig.class);
         resources.add(no.nibio.vips.core.service.ModelResourceImpl.class);
+        resources.add(no.nibio.vips.core.auth.AuthResource.class);
+        resources.add(no.nibio.vips.core.auth.JwtAuthFilter.class);
         resources.add(no.nibio.vips.core.web.SwaggerUiResource.class);
-        // OpenAPI endpoints: /openapi (JSON/YAML)
         resources.add(OpenApiResource.class);
         resources.add(AcceptHeaderOpenApiResource.class);
     }
