@@ -87,12 +87,12 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>PsilaRosaeObservationModel</artifactId>
-		<version>1.1.16</version>
+		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>PsilaRosaeTempModel</artifactId>
-		<version>1.1.16</version>
+		<version>1.1.17</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
