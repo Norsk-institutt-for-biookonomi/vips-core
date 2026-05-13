@@ -119,4 +119,9 @@
 		<artifactId>DayDegreesModel</artifactId>
 		<version>0.1.6</version>
 	</dependency>
+	<dependency>
+		<groupId>no.nibio.vips.model</groupId>
+		<artifactId>model-rimproxven</artifactId>
+		<version>1.0.0</version>
+	</dependency>
 </dependencies>
