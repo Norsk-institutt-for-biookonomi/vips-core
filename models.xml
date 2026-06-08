@@ -117,7 +117,7 @@
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
 		<artifactId>model-rimproxven</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	</dependency>
 	<dependency>
 		<groupId>no.nibio.vips.model</groupId>
